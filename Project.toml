@@ -1,0 +1,6 @@
+authors = ["jonathanbuchanan <jonathan.russ.buchanan@gmail.com>"]
+name = "PhysicsEngine"
+uuid = "547c94b8-caa0-11e8-3dc1-4fbbc3a0b290"
+version = "0.1.0"
+
+[deps]
