@@ -1,5 +1,5 @@
 module PhysicsEngine
 
-greet() = print("Hello World!")
+include("simulation.jl")
 
 end # module
