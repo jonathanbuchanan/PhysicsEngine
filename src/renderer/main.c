@@ -2,13 +2,15 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 
-void clear();
-void swapBuffers();
+#include "render.h"
 
 void error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
 }
 
+
+
+// Functions exposed to the Julia wrapper
 int init() {
   if (!glfwInit())
     return -1;
@@ -28,22 +30,20 @@ GLFWwindow * createWindow(int width, int height, char *title) {
   if (window == NULL)
     return NULL;
   glfwMakeContextCurrent(window);
-  clear();
-  swapBuffers(window);
-  glfwPollEvents();
+  GLenum glewError = glewInit();
+  if (glewError != GLEW_OK)
+    return NULL;
+
+  setClearColor(window, 0.133, 0.776, 0.776, 1.0);
+
   return window;
+}
+
+int windowCloseStatus(GLFWwindow *window) {
+  return glfwWindowShouldClose(window);
 }
 
 void terminate() {
   glfwTerminate();
-}
-
-
-void clear() {
-  glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void swapBuffers(GLFWwindow *window) {
-  glfwSwapBuffers(window);
 }
 

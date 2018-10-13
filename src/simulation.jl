@@ -1,3 +1,21 @@
+# Main simulation loop
+function simulate()
+  # Create the simulation
+  simulation = newSimulation()
+
+  # Create the rendering setup
+  windowWidth = 640
+  windowHeight = 480
+  windowTitle = "Simulation"
+
+  Renderer.init()
+  window = Renderer.createWindow(windowWidth, windowHeight, windowTitle)
+  while Renderer.windowCloseStatus(window) != true
+    Renderer.render(window)
+  end
+  Renderer.terminate()
+end
+
 # Simulation object
 "An object that encapsulates the state of a simulation"
 mutable struct Simulation

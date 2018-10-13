@@ -15,11 +15,19 @@ function init()
 end
 
 function createWindow(width::Int, height::Int, title::String)
-  return ccall((:createWindow, libPath), Cvoid, (Int32, Int32, Cstring), width, height, title)
+  return ccall((:createWindow, libPath), Window, (Int32, Int32, Cstring), width, height, title)
+end
+
+function windowCloseStatus(window::Window)
+  return ccall((:windowCloseStatus, libPath), Bool, (Window,), window)
+end
+
+function render(window::Window)
+  ccall((:render, libPath), Cvoid, (Window,), window)
 end
 
 function terminate()
-  return ccall((:terminate, libPath), Int32, ())
+  ccall((:terminate, libPath), Cvoid, ())
 end
 
 end

@@ -1,5 +1,5 @@
 project(PhysicsEngineRenderer C)
-add_library(physicsenginerenderer SHARED main.c)
+add_library(physicsenginerenderer SHARED main.c render.c)
 
 find_package(glfw3 REQUIRED)
 include_directories(${GLFW3_INCLUDE_DIR})
