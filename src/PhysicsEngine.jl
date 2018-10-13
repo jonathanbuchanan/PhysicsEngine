@@ -1,7 +1,7 @@
 module PhysicsEngine
 
+include("particle.jl")
 include("simulation.jl")
 include("grid.jl")
-include("particle.jl")
 
 end # module
