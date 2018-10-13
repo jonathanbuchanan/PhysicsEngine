@@ -8,6 +8,8 @@ end
 
 
 # Bindings
+
+# Main
 const Window = Ptr{Cvoid}
 
 function init()
@@ -22,12 +24,27 @@ function windowCloseStatus(window::Window)
   return ccall((:windowCloseStatus, libPath), Bool, (Window,), window)
 end
 
+function terminate()
+  ccall((:terminate, libPath), Cvoid, ())
+end
+
+
+# Render
 function render(window::Window)
   ccall((:render, libPath), Cvoid, (Window,), window)
 end
 
-function terminate()
-  ccall((:terminate, libPath), Cvoid, ())
+function clear(window::Window)
+  ccall((:clear, libPath), Cvoid, (Window,), window)
 end
+
+function swapBuffers(window::Window)
+  ccall((:swapBuffers, libPath), Cvoid, (Window,), window)
+end
+
+function setClearColor(window::Window, red::Float64, green::Float64, blue::Float64, alpha::Float64)
+  ccall((:setClearColor, libPath), Cvoid, (Window, Cfloat, Cfloat, Cfloat, Cfloat), window, red, green, blue, alpha)
+end
+
 
 end
