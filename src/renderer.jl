@@ -30,8 +30,14 @@ end
 
 
 # Render
-function render(window::Window)
-  ccall((:render, libPath), Cvoid, (Window,), window)
+const RenderInfo = Ptr{Cvoid}
+
+function createRenderer(window::Window)
+  ccall((:createRenderer, libPath), RenderInfo, (Window,), window)
+end
+
+function render(window::Window, renderer::RenderInfo)
+  ccall((:render, libPath), Cvoid, (Window, RenderInfo), window, renderer)
 end
 
 function clear(window::Window)

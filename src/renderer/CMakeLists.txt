@@ -1,6 +1,8 @@
 project(PhysicsEngineRenderer C)
 add_library(physicsenginerenderer SHARED main.c render.c)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 find_package(glfw3 REQUIRED)
 include_directories(${GLFW3_INCLUDE_DIR})
 target_link_libraries(physicsenginerenderer glfw3)
