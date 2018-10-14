@@ -1,5 +1,5 @@
 project(PhysicsEngineRenderer C)
-add_library(physicsenginerenderer SHARED main.c render.c)
+add_library(physicsenginerenderer SHARED main.c render.c vector.c)
 
 set(CMAKE_BUILD_TYPE Debug)
 

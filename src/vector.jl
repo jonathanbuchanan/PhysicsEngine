@@ -1,4 +1,9 @@
-# All vector/transformation code lives here
+# This file contains all linear algebra code
+# All functions are defined and called from the C library for interoperability
+
+
+
+# Vector3
 const Vector3 = NamedTuple{(:x, :y, :z), Tuple{Float64, Float64, Float64}}
 
 function vec3(x::Float64, y::Float64, z::Float64)
@@ -6,17 +11,68 @@ function vec3(x::Float64, y::Float64, z::Float64)
 end
 
 function Base.:+(a::Vector3, b::Vector3)
-  return vec3(a.x + b.x, a.y + b.y, a.z + b.z)
+  return ccall((:addVector3, @fullLibraryPath), Vector3, (Vector3, Vector3), a, b)
 end
 
 function Base.:-(a::Vector3, b::Vector3)
-  return vec3(a.x - b.x, a.y - b.y, a.z - b.z)
+  return ccall((:subtractVector3, @fullLibraryPath), Vector3, (Vector3, Vector3), a, b)
 end
 
 function dot(a::Vector3, b::Vector3)
-  return (a.x * b.x) + (a.y * b.y) + (a.z * b.z)
+  return ccall((:dotProduct, @fullLibraryPath), Cdouble, (Vector3, Vector3), a, b)
 end
 
 function Base.:*(a::Vector3, b::Vector3)
-  return vec3((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x))
+  return ccall((:crossProduct, @fullLibraryPath), Vector3, (Vector3, Vector3), a, b)
+end
+
+# Vector4
+const Vector4 = NamedTuple{(:x, :y, :z, :w), Tuple{Float64, Float64, Float64, Float64}}
+
+function Base.:+(a::Vector4, b::Vector4)
+  return ccall((:addVector4, @fullLibraryPath), Vector4, (Vector4, Vector4), a, b)
+end
+
+function Base.:-(a::Vector4, b::Vector4)
+  return ccall((:subtractVector4, @fullLibraryPath), Vector4, (Vector4, Vector4), a, b)
+end
+
+function dot(a::Vector4, b::Vector4)
+  return ccall((:dotProduct4, @fullLibraryPath), Cdouble, (Vector4, Vector4), a, b)
+end
+
+# Matrices
+const Matrix4x4 = NamedTuple{(:a11, :a12, :a13, :a14, :a21, :a22, :a23, :a24, :a31, :a32, :a33, :a34, :a41, :a42, :a43, :a44),
+  Tuple{Float64, Float64, Float64, Float64, Float64, Float64, Float64, Float64, Float64, Float64, Float64, Float64, Float64, Float64, Float64, Float64}}
+
+function Base.:*(a::Matrix4x4, b::Matrix4x4)
+  return ccall((:multiplyMatrix4x4, @fullLibraryPath), Matrix4x4, (Matrix4x4, Matrix4x4), a, b)
+end
+
+function identityMatrix()
+  return ccall((:identityMatrix4x4, @fullLibraryPath), Matrix4x4, ())
+end
+
+function translationMatrix(translation::Vector3)
+  return ccall((:translationMatrix, @fullLibraryPath), Matrix4x4, (Vector3,), translation)
+end
+
+function scalingMatrix(scale::Vector3)
+  return ccall((:scalingMatrix, @fullLibraryPath), Matrix4x4, (Vector3,), scale)
+end
+
+function rotationXMatrix(angle::Float64)
+  return ccall((:rotationXMatrix, @fullLibraryPath), Matrix4x4, (Cdouble,), angle)
+end
+
+function rotationYMatrix(angle::Float64)
+  return ccall((:rotationYMatrix, @fullLibraryPath), Matrix4x4, (Cdouble,), angle)
+end
+
+function rotationZMatrix(angle::Float64)
+  return ccall((:rotationZMatrix, @fullLibraryPath), Matrix4x4, (Cdouble,), angle)
+end
+
+function Base.:*(a::Matrix4x4, b::Vector4)
+  return ccall((:matrix4x4timesVector4, @fullLibraryPath), Vector4, (Matrix4x4, Vector4), a, b)
 end

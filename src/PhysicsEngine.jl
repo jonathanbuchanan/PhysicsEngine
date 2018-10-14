@@ -1,5 +1,11 @@
 module PhysicsEngine
 
+export fullLibraryPath
+
+macro fullLibraryPath()
+  return "./src/renderer/libphysicsenginerenderer"
+end
+
 include("vector.jl")
 include("renderer.jl")
 include("particle.jl")

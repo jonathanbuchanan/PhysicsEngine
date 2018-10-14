@@ -1,6 +1,8 @@
 using PhysicsEngine
 using Test
 
+cd("../")
+
 projectName = "PhysicsEngine"
 testFiles = [
   "simulation_test.jl"
