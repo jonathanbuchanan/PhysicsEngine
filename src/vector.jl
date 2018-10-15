@@ -76,3 +76,7 @@ end
 function Base.:*(a::Matrix4x4, b::Vector4)
   return ccall((:matrix4x4timesVector4, @fullLibraryPath), Vector4, (Matrix4x4, Vector4), a, b)
 end
+
+function perspective(zNear::Float64, zFar::Float64, fovy::Float64, aspect::Float64)
+  return ccall((:perspectiveProjectionMatrix, @fullLibraryPath), Matrix4x4, (Float64, Float64, Float64, Float64), zNear, zFar, fovy, aspect)
+end

@@ -26,6 +26,10 @@ Vector3 crossProduct(Vector3 a, Vector3 b) {
   return (Vector3){(a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x)};
 }
 
+Vector3 vec3(double x, double y, double z) {
+  return (Vector3){x, y, z};
+}
+
 
 
 double * accessVector4(Vector4 *v, int row) {
@@ -143,6 +147,35 @@ Vector4 matrix4x4timesVector4(Matrix4x4 a, Vector4 b) {
       value += aValue * bValue;
     }
     *accessVector4(&result, row) = value;
+  }
+  return result;
+}
+
+double tan(double x) {
+  return sin(x) / cos(x);
+}
+
+double cotan(double x) {
+  return 1 / tan(x);
+}
+
+Matrix4x4 perspectiveProjectionMatrix(double zNear, double zFar, double fovy, double aspect) {
+  Matrix4x4 result = {0};
+  double f = cotan(fovy / 2);
+  result.a11 = f / aspect;
+  result.a22 = f;
+  result.a33 = (zFar + zNear) / (zNear - zFar);
+  result.a34 = (2 * zFar * zNear) / (zNear - zFar);
+  result.a43 = -1;
+  return result;
+}
+
+Matrix4x4F matrix4x4toMatrix4x4F(Matrix4x4 m) {
+  Matrix4x4F result;
+  float *outArray = &result.a11;
+  double *inArray = &m.a11;
+  for (int i = 0; i < 16; ++i) {
+    outArray[i] = (float)inArray[i];
   }
   return result;
 }

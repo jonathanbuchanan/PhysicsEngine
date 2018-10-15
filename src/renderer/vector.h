@@ -1,6 +1,10 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <math.h>
+
+#define DEGREES_TO_RADIANS(degrees) (degrees * (M_PI / 180))
+
 // Vector
 typedef struct Vector3 {
   double x;
@@ -14,6 +18,7 @@ Vector3 addVector3(Vector3 a, Vector3 b);
 Vector3 subtractVector3(Vector3 a, Vector3 b);
 double dotProduct(Vector3 a, Vector3 b);
 Vector3 crossProduct(Vector3 a, Vector3 b);
+Vector3 vec3(double x, double y, double z);
 
 typedef struct Vector4 {
   double x;
@@ -45,5 +50,14 @@ Matrix4x4 rotationXMatrix(double angle);
 Matrix4x4 rotationYMatrix(double angle);
 Matrix4x4 rotationZMatrix(double angle);
 Vector4 matrix4x4timesVector4(Matrix4x4 a, Vector4 b);
+Matrix4x4 perspectiveProjectionMatrix(double nearPlane, double farPlane, double fovy, double aspect);
+
+typedef struct Matrix4x4F {
+  float a11, a12, a13, a14,
+        a21, a22, a23, a24,
+        a31, a32, a33, a34,
+        a41, a42, a43, a44;
+} Matrix4x4F;
+Matrix4x4F matrix4x4toMatrix4x4F(Matrix4x4 m);
 
 #endif

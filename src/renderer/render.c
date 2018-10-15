@@ -1,33 +1,98 @@
 #include "render.h"
+#include "vector.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 
 float vertices[] = {
-  -0.5, -0.5,
-  -0.5, 0.5,
-  0.5, -0.5
+  -0.5, -0.5, 0.0,
+  -0.5, 0.5, 0.0,
+  0.5, -0.5, 0.0,
+};
+
+float cube[] = {
+  -1.0, -1.0, 1.0,
+  -1.0, 1.0, 1.0,
+  1.0, -1.0, 1.0,
+
+  1.0, -1.0, 1.0,
+  1.0, 1.0, 1.0,
+  -1.0, 1.0, 1.0,
+
+
+  -1.0, 1.0, 1.0,
+  1.0, 1.0, 1.0,
+  1.0, 1.0, -1.0,
+
+  1.0, 1.0, -1.0,
+  -1.0, 1.0, -1.0,
+  -1.0, 1.0, 1.0,
+
+
+  -1.0, -1.0, 1.0,
+  1.0, -1.0, 1.0,
+  1.0, -1.0, -1.0,
+
+  1.0, -1.0, -1.0,
+  -1.0, -1.0, -1.0,
+  -1.0, -1.0, 1.0,
+
+
+  -1.0, -1.0, -1.0,
+  -1.0, 1.0, -1.0,
+  1.0, -1.0, -1.0,
+
+  1.0, -1.0, -1.0,
+  1.0, 1.0, -1.0,
+  -1.0, 1.0, -1.0,
+
+
+  -1.0, -1.0, 1.0,
+  -1.0, 1.0, 1.0,
+  -1.0, 1.0, -1.0,
+
+  -1.0, 1.0, -1.0,
+  -1.0, -1.0, -1.0,
+  -1.0, -1.0, 1.0,
+
+
+  1.0, -1.0, 1.0,
+  1.0, 1.0, 1.0,
+  1.0, 1.0, -1.0,
+
+  1.0, 1.0, -1.0,
+  1.0, -1.0, -1.0,
+  1.0, -1.0, 1.0
 };
 
 static const char* vertex_shader_text =
 "#version 330 core\n"
-"layout (location = 0) in vec2 pos;\n"
+"layout (location = 0) in vec3 pos;\n"
+"uniform mat4 model;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
+"out vec3 color;\n"
 "void main()\n"
 "{\n"
-"    gl_Position = vec4(pos, 0.0, 1.0);\n"
+"    gl_Position = projection * view * model * vec4(pos, 1.0);\n"
+"    color = pos;\n"
 "}\n";
 
 static const char* fragment_shader_text =
 "#version 330 core\n"
+"in vec3 color;\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"    FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
+"    FragColor = vec4(color, 1.0);\n"
 "}\n";
 
 RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
 
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
+
+  glEnable(GL_DEPTH_TEST);
 
   GLuint vao;
   glGenVertexArrays(1, &vao);
@@ -65,9 +130,9 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBindVertexArray(vao);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(cube), cube, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
   glEnableVertexAttribArray(0);
 
   renderer->shaderProgram = program;
@@ -77,6 +142,7 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   return renderer;
 }
 
+double step = 0.0;
 void render(GLFWwindow *window, RenderInfo *renderer) {
   glfwMakeContextCurrent(window);
 
@@ -88,10 +154,27 @@ void render(GLFWwindow *window, RenderInfo *renderer) {
   // Clear
   clear(window);
 
+  // Transform
+  Matrix4x4 scale = scalingMatrix(vec3(0.2, 0.2, 0.2));
+  Matrix4x4 rot1 = rotationYMatrix(step * 0.5);
+  Matrix4x4 rot2 = rotationZMatrix(step * 2);
+  step += 0.01;
+  Matrix4x4F model = matrix4x4toMatrix4x4F(multiplyMatrix4x4(multiplyMatrix4x4(scale, rot1), rot2));
+  unsigned int modelL = glGetUniformLocation(renderer->shaderProgram, "model");
+  glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
+
+  Matrix4x4F view = matrix4x4toMatrix4x4F(translationMatrix(vec3(0.0, 0.0, -2.0)));
+  unsigned int viewL = glGetUniformLocation(renderer->shaderProgram, "view");
+  glUniformMatrix4fv(viewL, 1, GL_TRUE, (GLfloat *)&view.a11);
+
+  Matrix4x4F projection = matrix4x4toMatrix4x4F(perspectiveProjectionMatrix(0.1, 100.0, DEGREES_TO_RADIANS(45.0), (double)(640.0 / 480.0)));
+  unsigned int projectionL = glGetUniformLocation(renderer->shaderProgram, "projection");
+  glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
+
   // Draw
   glUseProgram(renderer->shaderProgram);
   glBindVertexArray(renderer->vao);
-  glDrawArrays(GL_TRIANGLES, 0, 3); 
+  glDrawArrays(GL_TRIANGLES, 0, 36); 
 
   // Swap the buffers
   swapBuffers(window);
@@ -100,7 +183,7 @@ void render(GLFWwindow *window, RenderInfo *renderer) {
 
 void clear(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void swapBuffers(GLFWwindow *window) {
