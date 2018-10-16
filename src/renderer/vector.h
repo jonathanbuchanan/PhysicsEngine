@@ -4,6 +4,7 @@
 #include <math.h>
 
 #define DEGREES_TO_RADIANS(degrees) (degrees * (M_PI / 180))
+#define RADIANS_TO_DEGREES(radians) (radians * (180 / M_PI))
 
 // Vector
 typedef struct Vector3 {
