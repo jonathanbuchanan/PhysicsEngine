@@ -6,8 +6,6 @@
 
 typedef struct RenderInfo {
   GLuint shaderProgram;
-  GLuint vao;
-  GLuint vbo;
 } RenderInfo;
 
 RenderInfo * createRenderer(GLFWwindow *window);

@@ -42,6 +42,8 @@ typedef struct Matrix4x4 {
          a41, a42, a43, a44;
 } Matrix4x4;
 
+#define MATMUL(a, b) multiplyMatrix4x4(a, b)
+
 double * accessMatrix4x4(Matrix4x4 *m, int row, int column);
 Matrix4x4 multiplyMatrix4x4(Matrix4x4 a, Matrix4x4 b);
 Matrix4x4 identityMatrix4x4();

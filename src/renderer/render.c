@@ -132,19 +132,9 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   glLinkProgram(program);
 
   sphere = generateUVSphere(1.0, 32, 16);
-
-  GLuint vbo;
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBindVertexArray(vao);
-  glBufferData(GL_ARRAY_BUFFER, sphere.vertices_n * sizeof(float), sphere.vertices, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-  glEnableVertexAttribArray(0);
+  loadModel(&sphere);
 
   renderer->shaderProgram = program;
-  renderer->vbo = vbo;
-  renderer->vao = vao;
 
   return renderer;
 }
@@ -162,11 +152,10 @@ void render(GLFWwindow *window, RenderInfo *renderer) {
   clear(window);
 
   // Transform
-  Matrix4x4 scale = scalingMatrix(vec3(0.2, 0.2, 0.2));
-  Matrix4x4 rot1 = rotationYMatrix(step * 0.5);
-  Matrix4x4 rot2 = rotationZMatrix(step * 2);
+  sphere.position = vec3(0.0, 2.0 * sin(step), -3.0);
+  sphere.eulerRotation = vec3(step, 0.5 * step, 2.0 * step);
   step += 0.01;
-  Matrix4x4F model = matrix4x4toMatrix4x4F(multiplyMatrix4x4(multiplyMatrix4x4(scale, rot1), rot2));
+  Matrix4x4F model = matrix4x4toMatrix4x4F(modelMatrix(&sphere));
   unsigned int modelL = glGetUniformLocation(renderer->shaderProgram, "model");
   glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
 
@@ -180,8 +169,8 @@ void render(GLFWwindow *window, RenderInfo *renderer) {
 
   // Draw
   glUseProgram(renderer->shaderProgram);
-  glBindVertexArray(renderer->vao);
-  glDrawArrays(GL_TRIANGLES, 0, sphere.vertices_n); 
+
+  drawModel(&sphere);
 
   // Swap the buffers
   swapBuffers(window);
