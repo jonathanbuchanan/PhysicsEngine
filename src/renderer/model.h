@@ -7,8 +7,12 @@ typedef struct Model {
   float *vertices;
   int vertices_n;
 
+  unsigned int *indices;
+  unsigned int indices_n;
+
   unsigned int vbo;
   unsigned int vao;
+  unsigned int ebo;
 
   Vector3 position;
   Vector3 eulerRotation;

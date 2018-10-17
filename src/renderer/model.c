@@ -8,12 +8,16 @@
 
 int loadModel(Model *model) {
   glGenVertexArrays(1, &model->vao);
+  glBindVertexArray(model->vao);
 
   glGenBuffers(1, &model->vbo);
   glBindBuffer(GL_ARRAY_BUFFER, model->vbo);
-  glBindVertexArray(model->vao);
+
+  glGenBuffers(1, &model->ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->ebo);
 
   glBufferData(GL_ARRAY_BUFFER, model->vertices_n * sizeof(float), model->vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->indices_n * sizeof(unsigned int), model->indices, GL_STATIC_DRAW);
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
   glEnableVertexAttribArray(0);
@@ -23,8 +27,7 @@ int loadModel(Model *model) {
 
 int drawModel(Model *model) {
   glBindVertexArray(model->vao);
-  glDrawArrays(GL_TRIANGLES, 0, model->vertices_n);
-
+  glDrawElements(GL_TRIANGLES, model->indices_n, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
 }
 
@@ -45,38 +48,58 @@ Vector3 sphericalToCartesian(float radius, float inclination, float azimuth) {
 
 #include <stdio.h>
 Model generateUVSphere(float radius, int latDivisions, int longDivisions) {
+  int longVertices = longDivisions + 1;
+
   Model model;
-  model.vertices_n = 18 * latDivisions * longDivisions; // 6 * 3 * quads
+
+  model.vertices_n = 3 * latDivisions * longVertices;
   model.vertices = malloc(sizeof(float) * model.vertices_n);
+
+  model.indices_n = 6 * latDivisions * longDivisions;
+  model.indices = malloc(sizeof(unsigned int) * model.indices_n);
 
   float deltaThetaLat = (2 * M_PI) / latDivisions;
   float deltaThetaLong = M_PI / longDivisions;
-  int index = 0;
+
+  // Vertices
   for (int lat = 0; lat < latDivisions; ++lat) {
-    float thetaLatMin = lat * deltaThetaLat;
-    float thetaLatMax = (lat + 1) * deltaThetaLat;
+    float thetaLat = lat * deltaThetaLat;
+    for (int long_ = 0; long_ < longVertices; ++long_) {
+      float thetaLong = long_ * deltaThetaLong;
+
+      Vector3 vertex = sphericalToCartesian(radius, thetaLong, thetaLat);
+
+      float coordinates[] = {
+        vertex.x, vertex.y, vertex.z
+      };
+
+      memcpy(&model.vertices[((lat * longVertices) + long_) * 3], coordinates, 3 * sizeof(float));
+    }
+  }
+
+  // Indices
+  int index = 0;
+
+  for (int lat = 0; lat < latDivisions; ++lat) {
+    int latMin = lat;
+    int latMax = (lat + 1) % latDivisions;
     for (int long_ = 0; long_ < longDivisions; ++long_) {
-      float thetaLongMin = (long_ * deltaThetaLong);
-      float thetaLongMax = ((long_ + 1) * deltaThetaLong);
+      int longMin = long_;
+      int longMax = long_ + 1;
 
       // Four corners
-      Vector3 bl = sphericalToCartesian(radius, thetaLongMin, thetaLatMin);
-      Vector3 br = sphericalToCartesian(radius, thetaLongMin, thetaLatMax);
-      Vector3 tl = sphericalToCartesian(radius, thetaLongMax, thetaLatMin);
-      Vector3 tr = sphericalToCartesian(radius, thetaLongMax, thetaLatMax);
+      unsigned int bl = ((latMin * longVertices) + longMin);
+      unsigned int br = ((latMax * longVertices) + longMin);
+      unsigned int tl = ((latMin * longVertices) + longMax);
+      unsigned int tr = ((latMax * longVertices) + longMax);
 
       // Two triangles
-      float triangles[] = {
-        bl.x, bl.y, bl.z,
-        tl.x, tl.y, tl.z,
-        tr.x, tr.y, tr.z,
-
-        tr.x, tr.y, tr.z,
-        br.x, br.y, br.z,
-        bl.x, bl.y, bl.z
+      unsigned int triangles[] = {
+        bl, tl, tr,
+        tr, br, bl
       };
-      memcpy(&model.vertices[index], triangles, 18 * sizeof(float));
-      index += 18;
+      memcpy(&model.indices[index], triangles, 6 * sizeof(unsigned int));
+      index += 6;
     }
   }
 
