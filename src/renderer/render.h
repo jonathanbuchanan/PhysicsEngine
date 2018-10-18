@@ -4,11 +4,15 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "model.h"
+
 typedef struct RenderInfo {
   GLuint shaderProgram;
+  Model model;
 } RenderInfo;
 
 RenderInfo * createRenderer(GLFWwindow *window);
+void freeRenderer(RenderInfo *renderer);
 void render(GLFWwindow *window, RenderInfo *renderer);
 void clear(GLFWwindow *window);
 void swapBuffers(GLFWwindow *window);

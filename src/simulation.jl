@@ -14,7 +14,7 @@ function simulate()
   while Renderer.windowCloseStatus(window) != true
     Renderer.render(window, renderer)
   end
-  Renderer.terminate()
+  Renderer.terminate(renderer)
 end
 
 # Simulation object

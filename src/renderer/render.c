@@ -5,67 +5,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-float vertices[] = {
-  -0.5, -0.5, 0.0,
-  -0.5, 0.5, 0.0,
-  0.5, -0.5, 0.0,
-};
-
-float cube[] = {
-  -1.0, -1.0, 1.0,
-  -1.0, 1.0, 1.0,
-  1.0, -1.0, 1.0,
-
-  1.0, -1.0, 1.0,
-  1.0, 1.0, 1.0,
-  -1.0, 1.0, 1.0,
-
-
-  -1.0, 1.0, 1.0,
-  1.0, 1.0, 1.0,
-  1.0, 1.0, -1.0,
-
-  1.0, 1.0, -1.0,
-  -1.0, 1.0, -1.0,
-  -1.0, 1.0, 1.0,
-
-
-  -1.0, -1.0, 1.0,
-  1.0, -1.0, 1.0,
-  1.0, -1.0, -1.0,
-
-  1.0, -1.0, -1.0,
-  -1.0, -1.0, -1.0,
-  -1.0, -1.0, 1.0,
-
-
-  -1.0, -1.0, -1.0,
-  -1.0, 1.0, -1.0,
-  1.0, -1.0, -1.0,
-
-  1.0, -1.0, -1.0,
-  1.0, 1.0, -1.0,
-  -1.0, 1.0, -1.0,
-
-
-  -1.0, -1.0, 1.0,
-  -1.0, 1.0, 1.0,
-  -1.0, 1.0, -1.0,
-
-  -1.0, 1.0, -1.0,
-  -1.0, -1.0, -1.0,
-  -1.0, -1.0, 1.0,
-
-
-  1.0, -1.0, 1.0,
-  1.0, 1.0, 1.0,
-  1.0, 1.0, -1.0,
-
-  1.0, 1.0, -1.0,
-  1.0, -1.0, -1.0,
-  1.0, -1.0, 1.0
-};
-
 static const char* vertex_shader_text =
 "#version 330 core\n"
 "layout (location = 0) in vec3 pos;\n"
@@ -89,8 +28,6 @@ static const char* fragment_shader_text =
 "}\n";
 
 
-
-Model sphere;
 
 RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
@@ -131,13 +68,16 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   glAttachShader(program, fragment_shader);
   glLinkProgram(program);
 
-  //sphere = generateUVSphere(1.0, 32, 16);
-  sphere = generateIcoSphere(1.0, 3);
-  loadModel(&sphere);
+  renderer->model = generateIcoSphere(1.0, 3);
+  loadModel(&renderer->model);
 
   renderer->shaderProgram = program;
 
   return renderer;
+}
+
+void freeRenderer(RenderInfo *renderer) {
+  freeModel(&renderer->model);
 }
 
 double step = 0.0;
@@ -153,10 +93,10 @@ void render(GLFWwindow *window, RenderInfo *renderer) {
   clear(window);
 
   // Transform
-  sphere.position = vec3(0.0, 2.0 * sin(step), -3.0);
-  sphere.eulerRotation = vec3(step, 0.5 * step, 2.0 * step);
+  renderer->model.position = vec3(0.0, 2.0 * sin(step), -3.0);
+  renderer->model.eulerRotation = vec3(step, 0.5 * step, 2.0 * step);
   step += 0.01;
-  Matrix4x4F model = matrix4x4toMatrix4x4F(modelMatrix(&sphere));
+  Matrix4x4F model = matrix4x4toMatrix4x4F(modelMatrix(&renderer->model));
   unsigned int modelL = glGetUniformLocation(renderer->shaderProgram, "model");
   glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
 
@@ -171,7 +111,7 @@ void render(GLFWwindow *window, RenderInfo *renderer) {
   // Draw
   glUseProgram(renderer->shaderProgram);
 
-  drawModel(&sphere);
+  drawModel(&renderer->model);
 
   // Swap the buffers
   swapBuffers(window);

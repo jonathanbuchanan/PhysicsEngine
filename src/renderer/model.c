@@ -33,6 +33,16 @@ int drawModel(Model *model) {
   return 0;
 }
 
+int freeModel(Model *model) {
+  glDeleteBuffers(1, &model->vbo);
+  glDeleteBuffers(1, &model->ebo);
+
+  free(model->vertices);
+  free(model->indices);
+
+  return 0;
+}
+
 Matrix4x4 modelMatrix(Model *model) {
   Matrix4x4 translation = translationMatrix(model->position);
   Matrix4x4 rotX = rotationXMatrix(model->eulerRotation.x);

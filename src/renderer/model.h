@@ -21,6 +21,9 @@ typedef struct Model {
 // Loads the model data into OpenGL buffers
 int loadModel(Model *model);
 
+// Frees the model data
+int freeModel(Model *model);
+
 // Renders the model
 int drawModel(Model *model);
 

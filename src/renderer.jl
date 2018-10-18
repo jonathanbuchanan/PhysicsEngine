@@ -4,8 +4,8 @@ import ..@fullLibraryPath
 
 # Bindings
 
-# Main
 const Window = Ptr{Cvoid}
+const RenderInfo = Ptr{Cvoid}
 
 function init()
   return ccall((:init, @fullLibraryPath), Int32, ())
@@ -19,13 +19,9 @@ function windowCloseStatus(window::Window)
   return ccall((:windowCloseStatus, @fullLibraryPath), Bool, (Window,), window)
 end
 
-function terminate()
-  ccall((:terminate, @fullLibraryPath), Cvoid, ())
+function terminate(renderer::RenderInfo)
+  ccall((:terminate, @fullLibraryPath), Cvoid, (RenderInfo,), renderer)
 end
-
-
-# Render
-const RenderInfo = Ptr{Cvoid}
 
 #mutable struct Camera
 #  position::Vector3

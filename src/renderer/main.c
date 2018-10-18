@@ -43,7 +43,8 @@ int windowCloseStatus(GLFWwindow *window) {
   return glfwWindowShouldClose(window);
 }
 
-void terminate() {
+void terminate(RenderInfo *renderer) {
   glfwTerminate();
+  freeRenderer(renderer);
 }
 
