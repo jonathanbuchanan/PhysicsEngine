@@ -26,6 +26,10 @@ function Base.:*(a::Vector3, b::Vector3)
   return ccall((:crossProduct, @fullLibraryPath), Vector3, (Vector3, Vector3), a, b)
 end
 
+function magnitude(v::Vector3)
+  return ccall((:magnitudeVector3, @fullLibraryPath), Cdouble, (Vector3,), v)
+end
+
 # Vector4
 const Vector4 = NamedTuple{(:x, :y, :z, :w), Tuple{Float64, Float64, Float64, Float64}}
 
@@ -39,6 +43,10 @@ end
 
 function dot(a::Vector4, b::Vector4)
   return ccall((:dotProduct4, @fullLibraryPath), Cdouble, (Vector4, Vector4), a, b)
+end
+
+function magnitude(v::Vector4)
+  return ccall((:magnitudeVector4, @fullLibraryPath), Cdouble, (Vector4,), v)
 end
 
 # Matrices

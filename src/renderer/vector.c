@@ -26,6 +26,10 @@ Vector3 crossProduct(Vector3 a, Vector3 b) {
   return (Vector3){(a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x)};
 }
 
+double magnitudeVector3(Vector3 v) {
+  return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+}
+
 Vector3 vec3(double x, double y, double z) {
   return (Vector3){x, y, z};
 }
@@ -50,6 +54,10 @@ Vector4 subtractVector4(Vector4 a, Vector4 b) {
 
 double dotProduct4(Vector4 a, Vector4 b) {
   return (a.x * b.x) + (a.y * b.y) + (a.z * b.z) + (a.w * b.w);
+}
+
+double magnitudeVector4(Vector4 v) {
+  return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z) + (v.w * v.w));
 }
 
 

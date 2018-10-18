@@ -8,6 +8,7 @@ import PhysicsEngine
   @test v1 - v2 == PhysicsEngine.Vector3((-4.5, 9.0, -1.5))
   @test PhysicsEngine.dot(v1, v2) == 5.5 + -20.0 + 1.0
   @test v1 * v2 == PhysicsEngine.Vector3((-10.5, -10.5, -31.5))
+  @test PhysicsEngine.magnitude(v2) == sqrt(46.5)
 end
 
 @testset "Vector4" begin
@@ -17,6 +18,7 @@ end
   @test v1 + v2 == PhysicsEngine.Vector4((16, 18, 18, 23))
   @test v1 - v2 == PhysicsEngine.Vector4((10, 10, 8, 11))
   @test PhysicsEngine.dot(v1, v2) == 39 + 56 + 65 + 102
+  @test PhysicsEngine.magnitude(v2) == sqrt(86)
 end
 
 @testset "Matrix" begin

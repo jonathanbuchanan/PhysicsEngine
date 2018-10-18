@@ -131,7 +131,8 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   glAttachShader(program, fragment_shader);
   glLinkProgram(program);
 
-  sphere = generateUVSphere(1.0, 32, 16);
+  //sphere = generateUVSphere(1.0, 32, 16);
+  sphere = generateIcoSphere(1.0, 3);
   loadModel(&sphere);
 
   renderer->shaderProgram = program;

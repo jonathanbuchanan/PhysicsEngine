@@ -19,6 +19,7 @@ Vector3 addVector3(Vector3 a, Vector3 b);
 Vector3 subtractVector3(Vector3 a, Vector3 b);
 double dotProduct(Vector3 a, Vector3 b);
 Vector3 crossProduct(Vector3 a, Vector3 b);
+double magnitudeVector3(Vector3 v);
 Vector3 vec3(double x, double y, double z);
 
 typedef struct Vector4 {
