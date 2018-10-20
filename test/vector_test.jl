@@ -1,5 +1,15 @@
 import PhysicsEngine
 
+@testset "Vector2" begin
+  v1 = PhysicsEngine.Vector2((5.0, 7.0))
+  v2 = PhysicsEngine.Vector2((-3.5, 2.5))
+
+  @test v1 + v2 == PhysicsEngine.Vector2((1.5, 9.5))
+  @test v1 - v2 == PhysicsEngine.Vector2((8.5, 4.5))
+  @test PhysicsEngine.dot(v1, v2) == -17.5 + 17.5
+  @test PhysicsEngine.magnitude(v1) == sqrt(74)
+end
+
 @testset "Vector3" begin
   v1 = PhysicsEngine.Vector3((1.0, 5.0, -2.0))
   v2 = PhysicsEngine.Vector3((5.5, -4.0, -0.5))

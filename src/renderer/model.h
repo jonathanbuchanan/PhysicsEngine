@@ -3,6 +3,7 @@
 
 #include "vector.h"
 
+// A 3D model
 typedef struct Model {
   float *vertices;
   int vertices_n;
@@ -37,5 +38,27 @@ Model generateUVSphere(float radius, int latDivisions, int longDivisions);
 
 // Generates a sphere by subdividing an icosahedron and projecting each point onto the sphere
 Model generateIcoSphere(float radius, int subdivisions);
+
+
+typedef struct Quad {
+  unsigned int vbo;
+  unsigned int vao;
+  unsigned int ebo;
+
+  Vector2 size;
+  Vector2 position;
+} Quad;
+
+// Creates a quad and loads it into memory
+Quad generateQuad();
+
+// Frees the quad buffers
+int freeQuad(Quad *q);
+
+// Draws the quad
+int drawQuad2D(Quad *q);
+
+// Generates the model matrix for the quad
+Matrix4x4 quadModelMatrix(Quad *q);
 
 #endif

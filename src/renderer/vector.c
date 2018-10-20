@@ -3,6 +3,23 @@
 #include <stdlib.h>
 #include <math.h>
 
+Vector2 addVector2(Vector2 a, Vector2 b) {
+  return (Vector2){a.x + b.x, a.y + b.y};
+}
+
+Vector2 subtractVector2(Vector2 a, Vector2 b) {
+  return (Vector2){a.x - b.x, a.y - b.y};
+}
+
+double dotProduct2(Vector2 a, Vector2 b) {
+  return (a.x * b.x) + (a.y * b.y);
+}
+
+double magnitudeVector2(Vector2 v) {
+  return sqrt((v.x * v.x) + (v.y * v.y));
+}
+
+
 double * accessVector3(Vector3 *v, int row) {
   if (row == 0) { return &v->x; }
   else if (row == 1) { return &v->y; }

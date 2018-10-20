@@ -1,5 +1,7 @@
+cmake_minimum_required(VERSION 3.12)
+
 project(PhysicsEngineRenderer C)
-add_library(physicsenginerenderer SHARED main.c render.c vector.c model.c)
+add_library(physicsenginerenderer SHARED main.c render.c vector.c model.c menu.c)
 
 set(CMAKE_BUILD_TYPE Debug)
 

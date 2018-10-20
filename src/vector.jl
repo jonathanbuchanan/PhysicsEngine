@@ -2,6 +2,24 @@
 # All functions are defined and called from the C library for interoperability
 
 
+# Vector2
+const Vector2 = NamedTuple{(:x, :y), Tuple{Float64, Float64}}
+
+function Base.:+(a::Vector2, b::Vector2)
+  return ccall((:addVector2, @fullLibraryPath), Vector2, (Vector2, Vector2), a, b)
+end
+
+function Base.:-(a::Vector2, b::Vector2)
+  return ccall((:subtractVector2, @fullLibraryPath), Vector2, (Vector2, Vector2), a, b)
+end
+
+function dot(a::Vector2, b::Vector2)
+  return ccall((:dotProduct2, @fullLibraryPath), Cdouble, (Vector2, Vector2), a, b)
+end
+
+function magnitude(v::Vector2)
+  return ccall((:magnitudeVector2, @fullLibraryPath), Cdouble, (Vector2,), v)
+end
 
 # Vector3
 const Vector3 = NamedTuple{(:x, :y, :z), Tuple{Float64, Float64, Float64}}

@@ -40,6 +40,8 @@ int freeModel(Model *model) {
   free(model->vertices);
   free(model->indices);
 
+  glDeleteVertexArrays(1, &model->vao);
+
   return 0;
 }
 
@@ -252,4 +254,61 @@ Model generateIcoSphere(float radius, int subdivisions) {
   }
 
   return model;
+}
+
+const float quad_vertices[] = {
+  -1.0, -1.0,
+  -1.0, 1.0,
+  1.0, 1.0,
+  1.0, -1.0
+};
+
+const unsigned int quad_indices[] = {
+  0, 1, 2,
+  2, 3, 0
+};
+
+Quad generateQuad() {
+  Quad q;
+
+  glGenVertexArrays(1, &q.vao);
+  glBindVertexArray(q.vao);
+
+  glGenBuffers(1, &q.vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, q.vbo);
+
+  glGenBuffers(1, &q.ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, q.ebo);
+
+  glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quad_indices), quad_indices, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+  glEnableVertexAttribArray(0);
+
+  return q;
+}
+
+int freeQuad(Quad *q) {
+  glDeleteBuffers(1, &q->vbo);
+  glDeleteBuffers(1, &q->ebo);
+  glDeleteVertexArrays(1, &q->vao);
+
+  return 0;
+}
+
+int drawQuad2D(Quad *q) {
+  glBindVertexArray(q->vao);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  glBindVertexArray(0);
+ 
+
+  return 0;
+}
+
+Matrix4x4 quadModelMatrix(Quad *q) {
+  Matrix4x4 scale = scalingMatrix(vec3(q->size.x / 2.0, q->size.y / 2.0, 0.0));
+  Matrix4x4 translation = translationMatrix(vec3(q->position.x, q->position.y, 0.0));
+
+  return MATMUL(scale, translation);
 }

@@ -6,8 +6,13 @@
 
 #include "model.h"
 
+typedef GLuint ShaderProgram;
+
 typedef struct RenderInfo {
-  GLuint shaderProgram;
+  // Two shaders
+  ShaderProgram shader3D;
+  ShaderProgram shader2D;
+
   Model model;
 } RenderInfo;
 

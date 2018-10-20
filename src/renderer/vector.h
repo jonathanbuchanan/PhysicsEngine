@@ -7,6 +7,16 @@
 #define RADIANS_TO_DEGREES(radians) (radians * (180 / M_PI))
 
 // Vector
+typedef struct Vector2 {
+  double x;
+  double y;
+} Vector2;
+
+Vector2 addVector2(Vector2 a, Vector2 b);
+Vector2 subtractVector2(Vector2 a, Vector2 b);
+double dotProduct2(Vector2 a, Vector2 b);
+double magnitudeVector2(Vector2 v);
+
 typedef struct Vector3 {
   double x;
   double y;
