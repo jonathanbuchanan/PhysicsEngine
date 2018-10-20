@@ -7,14 +7,14 @@
 #include <GL/glew.h>
 
 int loadModel(Model *model) {
-  glGenVertexArrays(1, &model->vao);
-  glBindVertexArray(model->vao);
+  glGenVertexArrays(1, &model->mesh.vao);
+  glBindVertexArray(model->mesh.vao);
 
-  glGenBuffers(1, &model->vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, model->vbo);
+  glGenBuffers(1, &model->mesh.vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, model->mesh.vbo);
 
-  glGenBuffers(1, &model->ebo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->ebo);
+  glGenBuffers(1, &model->mesh.ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->mesh.ebo);
 
   glBufferData(GL_ARRAY_BUFFER, model->vertices_n * sizeof(float), model->vertices, GL_STATIC_DRAW);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->indices_n * sizeof(unsigned int), model->indices, GL_STATIC_DRAW);
@@ -26,7 +26,7 @@ int loadModel(Model *model) {
 }
 
 int drawModel(Model *model) {
-  glBindVertexArray(model->vao);
+  glBindVertexArray(model->mesh.vao);
   glDrawElements(GL_TRIANGLES, model->indices_n, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
 
@@ -34,13 +34,13 @@ int drawModel(Model *model) {
 }
 
 int freeModel(Model *model) {
-  glDeleteBuffers(1, &model->vbo);
-  glDeleteBuffers(1, &model->ebo);
+  glDeleteBuffers(1, &model->mesh.vbo);
+  glDeleteBuffers(1, &model->mesh.ebo);
 
   free(model->vertices);
   free(model->indices);
 
-  glDeleteVertexArrays(1, &model->vao);
+  glDeleteVertexArrays(1, &model->mesh.vao);
 
   return 0;
 }
@@ -256,49 +256,62 @@ Model generateIcoSphere(float radius, int subdivisions) {
   return model;
 }
 
-const float quad_vertices[] = {
-  -1.0, -1.0,
-  -1.0, 1.0,
-  1.0, 1.0,
-  1.0, -1.0
-};
 
-const unsigned int quad_indices[] = {
-  0, 1, 2,
-  2, 3, 0
-};
+Shape generateQuad() {
+  Shape q;
 
-Quad generateQuad() {
-  Quad q;
+  const float quad_vertices[] = {
+    -1.0, -1.0,
+    -1.0, 1.0,
+    1.0, 1.0,
+    1.0, -1.0
+  };
 
-  glGenVertexArrays(1, &q.vao);
-  glBindVertexArray(q.vao);
+  const unsigned int quad_indices[] = {
+    0, 1, 2,
+    2, 3, 0
+  };
 
-  glGenBuffers(1, &q.vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, q.vbo);
+  q.vertices = malloc(sizeof(quad_vertices));
+  q.vertices_n = 8;
+  memcpy(q.vertices, quad_vertices, sizeof(float) * q.vertices_n);
 
-  glGenBuffers(1, &q.ebo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, q.ebo);
-
-  glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quad_indices), quad_indices, GL_STATIC_DRAW);
-
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
-  glEnableVertexAttribArray(0);
+  q.indices = malloc(sizeof(quad_indices));
+  q.indices_n = 6;
+  memcpy(q.indices, quad_indices, sizeof(unsigned int) * q.indices_n);
 
   return q;
 }
 
-int freeQuad(Quad *q) {
-  glDeleteBuffers(1, &q->vbo);
-  glDeleteBuffers(1, &q->ebo);
-  glDeleteVertexArrays(1, &q->vao);
+int loadShape(Shape *s) {
+  glGenVertexArrays(1, &s->mesh.vao);
+  glBindVertexArray(s->mesh.vao);
+
+  glGenBuffers(1, &s->mesh.vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, s->mesh.vbo);
+
+  glGenBuffers(1, &s->mesh.ebo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, s->mesh.ebo);
+
+  glBufferData(GL_ARRAY_BUFFER, sizeof(float) * s->vertices_n, s->vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * s->indices_n, s->indices, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+  glEnableVertexAttribArray(0);
 
   return 0;
 }
 
-int drawQuad2D(Quad *q) {
-  glBindVertexArray(q->vao);
+int freeShape(Shape *s) {
+  glDeleteBuffers(1, &s->mesh.vbo);
+  glDeleteBuffers(1, &s->mesh.ebo);
+  glDeleteVertexArrays(1, &s->mesh.vao);
+
+  return 0;
+}
+
+int drawShape(Shape *s) {
+  glBindVertexArray(s->mesh.vao);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
  
@@ -306,9 +319,9 @@ int drawQuad2D(Quad *q) {
   return 0;
 }
 
-Matrix4x4 quadModelMatrix(Quad *q) {
-  Matrix4x4 scale = scalingMatrix(vec3(q->size.x / 2.0, q->size.y / 2.0, 0.0));
-  Matrix4x4 translation = translationMatrix(vec3(q->position.x, q->position.y, 0.0));
+Matrix4x4 shapeModelMatrix(Shape *s) {
+  Matrix4x4 scale = scalingMatrix(vec3(s->size.x / 2.0, s->size.y / 2.0, 0.0));
+  Matrix4x4 translation = translationMatrix(vec3(s->position.x, s->position.y, 0.0));
 
   return MATMUL(scale, translation);
 }

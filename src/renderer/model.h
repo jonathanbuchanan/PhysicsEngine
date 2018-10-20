@@ -3,17 +3,22 @@
 
 #include "vector.h"
 
+// An object containing a VAO, VBO, and EBO
+typedef struct Mesh {
+  unsigned int vbo;
+  unsigned int vao;
+  unsigned int ebo;
+} Mesh;
+
 // A 3D model
 typedef struct Model {
   float *vertices;
   int vertices_n;
 
   unsigned int *indices;
-  unsigned int indices_n;
+  int indices_n;
 
-  unsigned int vbo;
-  unsigned int vao;
-  unsigned int ebo;
+  Mesh mesh;
 
   Vector3 position;
   Vector3 eulerRotation;
@@ -40,25 +45,33 @@ Model generateUVSphere(float radius, int latDivisions, int longDivisions);
 Model generateIcoSphere(float radius, int subdivisions);
 
 
-typedef struct Quad {
-  unsigned int vbo;
-  unsigned int vao;
-  unsigned int ebo;
+// A 2D shape
+typedef struct Shape {
+  float *vertices;
+  int vertices_n;
+
+  unsigned int *indices;
+  int indices_n;
+
+  Mesh mesh;
 
   Vector2 size;
   Vector2 position;
-} Quad;
+} Shape;
 
-// Creates a quad and loads it into memory
-Quad generateQuad();
+// Creates a quad
+Shape generateQuad();
+
+// Loads the shape into buffers
+int loadShape(Shape *s);
 
 // Frees the quad buffers
-int freeQuad(Quad *q);
+int freeShape(Shape *s);
 
 // Draws the quad
-int drawQuad2D(Quad *q);
+int drawShape(Shape *s);
 
 // Generates the model matrix for the quad
-Matrix4x4 quadModelMatrix(Quad *q);
+Matrix4x4 shapeModelMatrix(Shape *s);
 
 #endif

@@ -75,7 +75,7 @@ ShaderProgram compileShader(const char *vertex_shader_source, const char *fragme
   return program;
 }
 
-Quad quad;
+Shape quad;
 RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
 
@@ -104,6 +104,7 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   loadModel(&renderer->model);
 
   quad = generateQuad();
+  loadShape(&quad);
   Vector2 size = (Vector2){1.0, 0.1};
   quad.size = size;
 
@@ -112,7 +113,7 @@ RenderInfo * createRenderer(GLFWwindow *window) {
 
 void freeRenderer(RenderInfo *renderer) {
   freeModel(&renderer->model);
-  freeQuad(&quad);
+  freeShape(&quad);
 }
 
 double step = 0.0;
@@ -151,11 +152,11 @@ void render(GLFWwindow *window, RenderInfo *renderer) {
 
   glUseProgram(renderer->shader2D);
 
-  model = matrix4x4toMatrix4x4F(quadModelMatrix(&quad));
+  model = matrix4x4toMatrix4x4F(shapeModelMatrix(&quad));
   modelL = glGetUniformLocation(renderer->shader2D, "model");
   glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
 
-  drawQuad2D(&quad);
+  drawShape(&quad);
 
   // Swap the buffers
   swapBuffers(window);
