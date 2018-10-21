@@ -7,8 +7,8 @@ int drawControl(Control *control, RenderInfo *renderer) {
   return (control->draw)(control->control, renderer);
 }
 
-int updateControl(Control *control) {
-  return (control->update)(control->control);
+int updateControl(Control *control, RenderInfo *renderer) {
+  return (control->update)(control->control, renderer);
 }
 
 
@@ -31,9 +31,9 @@ int drawMenu(Menu *menu, RenderInfo *renderer) {
   return 0;
 }
 
-int updateMenu(Menu *menu) {
+int updateMenu(Menu *menu, RenderInfo *renderer) {
   for (int i = 0; i < menu->controls_n; ++i) {
-    updateControl(menu->controls[i]);
+    updateControl(menu->controls[i], renderer);
   }
   return 0;
 }
@@ -43,6 +43,7 @@ int updateMenu(Menu *menu) {
 Control createButton(Vector2 size, Vector2 position) {
   Button *b = malloc(sizeof(Button));
 
+  b->state = Normal;
   b->size = size;
   b->position = position;
 
@@ -54,19 +55,38 @@ Control createButton(Vector2 size, Vector2 position) {
 int drawButton(void *c, RenderInfo *renderer) {
   Button *button = (Button *)c;
 
+  Vector2 windowSize = getWindowSize(renderer);
+
   // Convert pixel coordinates to NDC
   // Position specifies bottom left coordinates
-  Vector2 windowSize = getWindowSize(renderer);
   Vector2 size = (Vector2){2 * (button->size.x / windowSize.x), 2 * (button->size.y / windowSize.y)};
   Vector2 position = (Vector2){(2 * (button->position.x / windowSize.x)) - 1.0 + (size.x / 2), (2 * (button->position.y / windowSize.y)) - 1.0 + (size.y / 2)};
+
+  Vector4 color;
+  if (button->state == Normal)
+    color = button->color;
+  else if (button->state == Highlighted)
+    color = button->highlight;
   
-  renderQuad(renderer, size, position, button->color);
+  
+  renderQuad(renderer, size, position, color);
 
   return 0;
 }
 
-int updateButton(void *c) {
+int updateButton(void *c, RenderInfo *renderer) {
   Button *button = (Button *)c;
+
+  Vector2 cursorPosition = getCursorPosition(renderer);
+
+  // Test for mouse position
+  if (cursorPosition.x >= button->position.x && cursorPosition.y >= button->position.y &&
+      cursorPosition.x <= button->position.x + button->size.x && cursorPosition.y <= button->position.y + button->size.y) {
+    button->state = Highlighted;
+  } else {
+    button->state = Normal;
+  }
+
   return 0;
 }
 
@@ -85,7 +105,7 @@ int drawLabel(void *c, RenderInfo *renderer) {
   return 0;
 }
 
-int updateLabel(void *c) {
+int updateLabel(void *c, RenderInfo *renderer) {
   Label *label = (Label *)c;
   return 0;
 }

@@ -111,6 +111,7 @@ RenderInfo * createRenderer(GLFWwindow *window) {
 
   renderer->menu = createMenu();
   button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
+  ((Button *)button.control)->highlight = vec4(1.0, 1.0, 1.0, 1.0);
   addControlToMenu(&renderer->menu, &button);
 
   return renderer;
@@ -160,6 +161,7 @@ void render(RenderInfo *renderer) {
 
   glUseProgram(renderer->shader2D);
 
+  updateMenu(&renderer->menu, renderer);
   drawMenu(&renderer->menu, renderer);
 
   // Swap the buffers
@@ -187,6 +189,14 @@ Vector2 getWindowSize(const RenderInfo *renderer) {
   int width, height;
   glfwGetWindowSize(renderer->window, &width, &height);
   return (Vector2){(double)width, (double)height};
+}
+
+Vector2 getCursorPosition(const RenderInfo *renderer) {
+  Vector2 size = getWindowSize(renderer);
+
+  double x, y;
+  glfwGetCursorPos(renderer->window, &x, &y);
+  return vec2(x, size.y - y);
 }
 
 void clear(GLFWwindow *window) {

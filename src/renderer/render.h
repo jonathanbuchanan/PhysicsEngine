@@ -28,6 +28,7 @@ void render(RenderInfo *renderer);
 void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color);
 
 Vector2 getWindowSize(const RenderInfo *renderer);
+Vector2 getCursorPosition(const RenderInfo *renderer);
 void clear(GLFWwindow *window);
 void swapBuffers(GLFWwindow *window);
 void setClearColor(GLFWwindow *window, float red, float green, float blue, float alpha);

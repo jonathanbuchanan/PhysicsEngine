@@ -5,14 +5,20 @@ typedef struct RenderInfo RenderInfo;
 
 #include "vector.h"
 
+typedef enum ControlState {
+  Normal = 0,
+  Highlighted = 1,
+  Selected = 2
+} ControlState;
+
 typedef struct Control {
   void *control;
   int (* draw)(void *control, RenderInfo *renderer);
-  int (* update)(void *control);
+  int (* update)(void *control, RenderInfo *renderer);
 } Control;
 
 int drawControl(Control *control, RenderInfo *renderer);
-int updateControl(Control *control);
+int updateControl(Control *control, RenderInfo *renderer);
 
 typedef struct Menu {
   Control **controls;
@@ -21,11 +27,13 @@ typedef struct Menu {
 
 Menu createMenu();
 int drawMenu(Menu *menu, RenderInfo *renderer);
-int updateMenu(Menu *menu);
+int updateMenu(Menu *menu, RenderInfo *renderer);
 void addControlToMenu(Menu *menu, Control *control);
 
 // Menu Controls (sizes are given in pixels)
 typedef struct Button {
+  ControlState state;
+
   Vector2 size;
   Vector2 position;
 
@@ -40,7 +48,7 @@ typedef struct Button {
 
 Control createButton(Vector2 size, Vector2 position);
 int drawButton(void *c, RenderInfo *renderer);
-int updateButton(void *c);
+int updateButton(void *c, RenderInfo *renderer);
 
 typedef struct Label {
   Vector2 size;
@@ -53,6 +61,6 @@ typedef struct Label {
 
 Control createLabel();
 int drawLabel(void *c, RenderInfo *renderer);
-int updateLabel(void *c);
+int updateLabel(void *c, RenderInfo *renderer);
 
 #endif
