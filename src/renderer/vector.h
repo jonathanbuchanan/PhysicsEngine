@@ -16,6 +16,7 @@ Vector2 addVector2(Vector2 a, Vector2 b);
 Vector2 subtractVector2(Vector2 a, Vector2 b);
 double dotProduct2(Vector2 a, Vector2 b);
 double magnitudeVector2(Vector2 v);
+Vector2 vec2(double x, double y);
 
 typedef struct Vector3 {
   double x;
@@ -44,6 +45,7 @@ double * accessVector4(Vector4 *v, int row);
 Vector4 addVector4(Vector4 a, Vector4 b);
 Vector4 subtractVector4(Vector4 a, Vector4 b);
 double dotProduct4(Vector4 a, Vector4 b);
+Vector4 vec4(double x, double y, double z, double w);
 
 // Matrix
 typedef struct Matrix4x4 {

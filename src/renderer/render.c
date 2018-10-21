@@ -38,8 +38,9 @@ static const char *vertex_shader_2D =
 static const char *fragment_shader_2D =
 "#version 330 core\n"
 "out vec4 FragColor;\n"
+"uniform vec4 color;\n"
 "void main() {\n"
-"    FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
+"    FragColor = color;\n"
 "}\n";
 
 
@@ -75,11 +76,13 @@ ShaderProgram compileShader(const char *vertex_shader_source, const char *fragme
   return program;
 }
 
-Shape quad;
+Control button;
 RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
 
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
+
+  renderer->window = window;
 
   glEnable(GL_DEPTH_TEST);
 
@@ -103,21 +106,24 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   renderer->model = generateIcoSphere(1.0, 3);
   loadModel(&renderer->model);
 
-  quad = generateQuad();
-  loadShape(&quad);
-  Vector2 size = (Vector2){1.0, 0.1};
-  quad.size = size;
+  renderer->quad2D = generateQuad();
+  loadShape(&renderer->quad2D);
+
+  renderer->menu = createMenu();
+  button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
+  addControlToMenu(&renderer->menu, &button);
 
   return renderer;
 }
 
 void freeRenderer(RenderInfo *renderer) {
   freeModel(&renderer->model);
-  freeShape(&quad);
 }
 
 double step = 0.0;
-void render(GLFWwindow *window, RenderInfo *renderer) {
+void render(RenderInfo *renderer) {
+  GLFWwindow *window = renderer->window;
+
   glfwMakeContextCurrent(window);
 
   // Set the viewport
@@ -150,17 +156,37 @@ void render(GLFWwindow *window, RenderInfo *renderer) {
 
 
 
+  ((Button *)button.control)->color = vec4(fabs(sin(step * 0.4)), fabs(cos(step * 0.2)), fabs(sin(step * 0.55)), 1.0);
+
   glUseProgram(renderer->shader2D);
 
-  model = matrix4x4toMatrix4x4F(shapeModelMatrix(&quad));
-  modelL = glGetUniformLocation(renderer->shader2D, "model");
-  glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
-
-  drawShape(&quad);
+  drawMenu(&renderer->menu, renderer);
 
   // Swap the buffers
   swapBuffers(window);
   glfwPollEvents();
+}
+
+void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color) {
+  glUseProgram(renderer->shader2D);
+
+  renderer->quad2D.size = size;
+  renderer->quad2D.position = position;
+
+  Matrix4x4F model = matrix4x4toMatrix4x4F(shapeModelMatrix(&renderer->quad2D));
+  unsigned int modelL = glGetUniformLocation(renderer->shader2D, "model");
+  glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
+
+  unsigned int colorL = glGetUniformLocation(renderer->shader2D, "color");
+  glUniform4f(colorL, color.x, color.y, color.z, color.w);
+
+  drawShape(&renderer->quad2D);
+}
+
+Vector2 getWindowSize(const RenderInfo *renderer) {
+  int width, height;
+  glfwGetWindowSize(renderer->window, &width, &height);
+  return (Vector2){(double)width, (double)height};
 }
 
 void clear(GLFWwindow *window) {

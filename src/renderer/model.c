@@ -323,5 +323,5 @@ Matrix4x4 shapeModelMatrix(Shape *s) {
   Matrix4x4 scale = scalingMatrix(vec3(s->size.x / 2.0, s->size.y / 2.0, 0.0));
   Matrix4x4 translation = translationMatrix(vec3(s->position.x, s->position.y, 0.0));
 
-  return MATMUL(scale, translation);
+  return MATMUL(translation, scale);
 }

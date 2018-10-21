@@ -19,6 +19,10 @@ double magnitudeVector2(Vector2 v) {
   return sqrt((v.x * v.x) + (v.y * v.y));
 }
 
+Vector2 vec2(double x, double y) {
+  return (Vector2){x, y};
+}
+
 
 double * accessVector3(Vector3 *v, int row) {
   if (row == 0) { return &v->x; }
@@ -75,6 +79,10 @@ double dotProduct4(Vector4 a, Vector4 b) {
 
 double magnitudeVector4(Vector4 v) {
   return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z) + (v.w * v.w));
+}
+
+Vector4 vec4(double x, double y, double z, double w) {
+  return (Vector4){x, y, z, w};
 }
 
 

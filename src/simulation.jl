@@ -12,7 +12,7 @@ function simulate()
   window = Renderer.createWindow(windowWidth, windowHeight, windowTitle)
   renderer = Renderer.createRenderer(window)
   while Renderer.windowCloseStatus(window) != true
-    Renderer.render(window, renderer)
+    Renderer.render(renderer)
   end
   Renderer.terminate(renderer)
 end

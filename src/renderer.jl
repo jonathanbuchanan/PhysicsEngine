@@ -31,8 +31,8 @@ function createRenderer(window::Window)
   ccall((:createRenderer, @fullLibraryPath), RenderInfo, (Window,), window)
 end
 
-function render(window::Window, renderer::RenderInfo)
-  ccall((:render, @fullLibraryPath), Cvoid, (Window, RenderInfo), window, renderer)
+function render(renderer::RenderInfo)
+  ccall((:render, @fullLibraryPath), Cvoid, (RenderInfo,), renderer)
 end
 
 function clear(window::Window)
