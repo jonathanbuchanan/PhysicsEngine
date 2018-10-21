@@ -67,7 +67,8 @@ int drawButton(void *c, RenderInfo *renderer) {
     color = button->color;
   else if (button->state == Highlighted)
     color = button->highlight;
-  
+  else if (button->state == Selected)
+    color = button->select; 
   
   renderQuad(renderer, size, position, color);
 
@@ -78,11 +79,18 @@ int updateButton(void *c, RenderInfo *renderer) {
   Button *button = (Button *)c;
 
   Vector2 cursorPosition = getCursorPosition(renderer);
+  int leftButton = isLeftMouseButtonPressed(renderer);
 
   // Test for mouse position
   if (cursorPosition.x >= button->position.x && cursorPosition.y >= button->position.y &&
       cursorPosition.x <= button->position.x + button->size.x && cursorPosition.y <= button->position.y + button->size.y) {
-    button->state = Highlighted;
+    if (leftButton == 1) {
+      // Call the action if the state changed to selected
+      if (button->state != Selected && button->action != NULL)
+        button->action(button);
+      button->state = Selected;
+    } else
+      button->state = Highlighted;
   } else {
     button->state = Normal;
   }

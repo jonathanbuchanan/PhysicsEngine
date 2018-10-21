@@ -76,6 +76,10 @@ ShaderProgram compileShader(const char *vertex_shader_source, const char *fragme
   return program;
 }
 
+void test_callback(Button *b) {
+  printf("press\n");
+}
+
 Control button;
 RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
@@ -112,6 +116,8 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   renderer->menu = createMenu();
   button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
   ((Button *)button.control)->highlight = vec4(1.0, 1.0, 1.0, 1.0);
+  ((Button *)button.control)->select = vec4(1.0, 0.0, 1.0, 1.0);
+  ((Button *)button.control)->action = test_callback;
   addControlToMenu(&renderer->menu, &button);
 
   return renderer;
@@ -197,6 +203,14 @@ Vector2 getCursorPosition(const RenderInfo *renderer) {
   double x, y;
   glfwGetCursorPos(renderer->window, &x, &y);
   return vec2(x, size.y - y);
+}
+
+int isLeftMouseButtonPressed(const RenderInfo *renderer) {
+  int state = glfwGetMouseButton(renderer->window, GLFW_MOUSE_BUTTON_LEFT);
+  if (state == GLFW_PRESS)
+    return 1;
+  else
+    return 0;
 }
 
 void clear(GLFWwindow *window) {

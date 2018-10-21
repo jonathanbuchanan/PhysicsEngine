@@ -39,6 +39,8 @@ typedef struct Button {
 
   Vector4 color;
   Vector4 highlight;
+  Vector4 select;
+
   Vector4 textColor;
 
   const char *text;
