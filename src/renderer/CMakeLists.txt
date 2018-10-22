@@ -6,12 +6,16 @@ add_library(physicsenginerenderer SHARED main.c render.c vector.c model.c menu.c
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(glfw3 REQUIRED)
-include_directories(${GLFW3_INCLUDE_DIR})
+include_directories(${GLFW3_INCLUDE_DIRS})
 target_link_libraries(physicsenginerenderer glfw3)
 
 find_package(glew REQUIRED)
-include_directories(${GLEW_INCLUDE_DIR})
+include_directories(${GLEW_INCLUDE_DIRS})
 target_link_libraries(physicsenginerenderer glew)
+
+find_package(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+target_link_libraries(physicsenginerenderer ${FREETYPE_LIBRARIES})
 
 if(APPLE)
   find_package(OpenGL REQUIRED)
