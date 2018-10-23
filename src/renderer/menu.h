@@ -51,6 +51,7 @@ typedef struct Button {
 Control createButton(Vector2 size, Vector2 position);
 int drawButton(void *c, RenderInfo *renderer);
 int updateButton(void *c, RenderInfo *renderer);
+Button * getButton(Control *button);
 
 typedef struct Label {
   Vector2 size;
@@ -61,8 +62,9 @@ typedef struct Label {
   const char *text;
 } Label;
 
-Control createLabel();
+Control createLabel(Vector2 size, Vector2 position);
 int drawLabel(void *c, RenderInfo *renderer);
 int updateLabel(void *c, RenderInfo *renderer);
+Label * getLabel(Control *label);
 
 #endif

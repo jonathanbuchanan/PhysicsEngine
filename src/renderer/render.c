@@ -62,9 +62,10 @@ static const char *fragment_shader_2D_textured =
 "out vec4 FragColor;\n"
 "in vec2 texCoords;\n"
 "uniform sampler2D text;\n"
+"uniform vec4 color;\n"
 "void main() {\n"
 "    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);\n"
-"    FragColor = sampled;\n"
+"    FragColor = color * sampled;\n"
 "}\n";
 
 
@@ -148,6 +149,7 @@ void test_callback(Button *b) {
 }
 
 Control button;
+Control label;
 RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
 
@@ -195,10 +197,19 @@ RenderInfo * createRenderer(GLFWwindow *window) {
 
   renderer->menu = createMenu();
   button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
-  ((Button *)button.control)->highlight = vec4(1.0, 1.0, 1.0, 1.0);
-  ((Button *)button.control)->select = vec4(1.0, 0.0, 1.0, 1.0);
-  ((Button *)button.control)->action = test_callback;
+  Button *b = getButton(&button);
+  b->highlight = vec4(1.0, 1.0, 1.0, 1.0);
+  b->select = vec4(1.0, 0.0, 1.0, 1.0);
+  b->action = test_callback;
+  b->text = "Button";
+  b->textColor = vec4(0.5, 0.5, 0.5, 1.0);
   addControlToMenu(&renderer->menu, &button);
+
+  label = createLabel(vec2(100.0, 100.0), vec2(100.0, 100.0));
+  Label *l = getLabel(&label);
+  l->color = vec4(1.0, 1.0, 1.0, 1.0);
+  l->text = "I am a label.";
+  addControlToMenu(&renderer->menu, &label);
 
   return renderer;
 }
@@ -304,6 +315,9 @@ void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector
     Matrix4x4F model = matrix4x4toMatrix4x4F(shapeModelMatrix(&renderer->quad2D));
     unsigned int modelL = glGetUniformLocation(renderer->shader2DTextured, "model");
     glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
+
+    unsigned int colorL = glGetUniformLocation(renderer->shader2DTextured, "color");
+    glUniform4f(colorL, color.x, color.y, color.z, color.w);
 
     drawShape(&renderer->quad2D);
 

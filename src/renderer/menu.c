@@ -71,7 +71,7 @@ int drawButton(void *c, RenderInfo *renderer) {
     color = button->select; 
   
   renderQuad(renderer, size, position, color);
-  renderText(renderer, "Hello, World!", position, color);
+  renderText(renderer, button->text, position, button->textColor);
 
   return 0;
 }
@@ -99,10 +99,17 @@ int updateButton(void *c, RenderInfo *renderer) {
   return 0;
 }
 
+Button * getButton(Control *button) {
+  return (Button *)button->control;
+}
 
 
-Control createLabel() {
+
+Control createLabel(Vector2 size, Vector2 position) {
   Label *l = malloc(sizeof(Label));
+
+  l->size = size;
+  l->position = position;
 
   Control c = {l, drawLabel, updateLabel};
 
@@ -111,10 +118,24 @@ Control createLabel() {
 
 int drawLabel(void *c, RenderInfo *renderer) {
   Label *label = (Label *)c;
+
+  Vector2 windowSize = getWindowSize(renderer);
+
+  // Convert pixel coordinates to NDC
+  // Position specifies bottom left coordinates
+  Vector2 size = (Vector2){2 * (label->size.x / windowSize.x), 2 * (label->size.y / windowSize.y)};
+  Vector2 position = (Vector2){(2 * (label->position.x / windowSize.x)) - 1.0 + (size.x / 2), (2 * (label->position.y / windowSize.y)) - 1.0 + (size.y / 2)};
+
+  renderText(renderer, label->text, label->position, label->color);
+
   return 0;
 }
 
 int updateLabel(void *c, RenderInfo *renderer) {
   Label *label = (Label *)c;
   return 0;
+}
+
+Label * getLabel(Control *label) {
+  return (Label *)label->control;
 }
