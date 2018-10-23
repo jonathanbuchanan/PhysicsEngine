@@ -45,6 +45,30 @@ static const char *fragment_shader_2D =
 
 
 
+static const char *vertex_shader_2D_textured =
+"#version 330 core\n"
+"layout (location = 0) in vec2 pos;\n"
+"layout (location = 1) in vec2 textureCoordinates;\n"
+"uniform mat4 model;\n"
+"out vec2 texCoords;\n"
+"void main() {\n"
+"    gl_Position = model * vec4(pos, 0.0, 1.0);\n"
+"    gl_Position.z = -0.5;\n" // <-- Eliminate this hard-wire
+"    texCoords = textureCoordinates;\n"
+"}\n";
+
+static const char *fragment_shader_2D_textured =
+"#version 330 core\n"
+"out vec4 FragColor;\n"
+"in vec2 texCoords;\n"
+"uniform sampler2D text;\n"
+"void main() {\n"
+"    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);\n"
+"    FragColor = sampled;\n"
+"}\n";
+
+
+
 ShaderProgram compileShader(const char *vertex_shader_source, const char *fragment_shader_source) {
   GLuint vertex_shader, fragment_shader;
   vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -76,6 +100,49 @@ ShaderProgram compileShader(const char *vertex_shader_source, const char *fragme
   return program;
 }
 
+int loadFont(RenderInfo *renderer) {
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);  
+
+  int error = FT_Init_FreeType(&renderer->fontLibrary);
+  if (error)
+    return -1;
+
+  error = FT_New_Face(renderer->fontLibrary, "/Library/Fonts/Arial.ttf", 0, &renderer->fontFace);
+  if (error)
+    return -1;
+
+  error = FT_Set_Pixel_Sizes(renderer->fontFace, 0, 48);
+  if (error)
+    return -1;
+
+  for (int c = 0; c < GLYPH_COUNT; ++c) {
+    error = FT_Load_Char(renderer->fontFace, c, FT_LOAD_RENDER);
+    if (error)
+      return -1;
+
+    Glyph g;
+
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, renderer->fontFace->glyph->bitmap.width, renderer->fontFace->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, renderer->fontFace->glyph->bitmap.buffer);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    g.textureID = texture;
+    g.size = vec2(renderer->fontFace->glyph->bitmap.width, renderer->fontFace->glyph->bitmap.rows);
+    g.bearing = vec2(renderer->fontFace->glyph->bitmap_left, renderer->fontFace->glyph->bitmap_top);
+    g.advance = renderer->fontFace->glyph->advance.x;
+
+    renderer->glyphs[c] = g;
+  }
+
+  return 0;
+}
+
 void test_callback(Button *b) {
   printf("press\n");
 }
@@ -86,9 +153,15 @@ RenderInfo * createRenderer(GLFWwindow *window) {
 
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
 
+  if (loadFont(renderer) == -1)
+    return NULL;
+
   renderer->window = window;
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+
 
   GLuint vao;
   glGenVertexArrays(1, &vao);
@@ -105,6 +178,13 @@ RenderInfo * createRenderer(GLFWwindow *window) {
     printf("Error compiling 2D shader\n");
   } else {
     renderer->shader2D = shader2D;
+  }
+
+  ShaderProgram shader2DTextured = compileShader(vertex_shader_2D_textured, fragment_shader_2D_textured);
+  if (shader2DTextured == -1) {
+    printf("Error compiling 2D-Textured shader\n");
+  } else {
+    renderer->shader2DTextured = shader2DTextured;
   }
 
   renderer->model = generateIcoSphere(1.0, 3);
@@ -125,6 +205,10 @@ RenderInfo * createRenderer(GLFWwindow *window) {
 
 void freeRenderer(RenderInfo *renderer) {
   freeModel(&renderer->model);
+  freeShape(&renderer->quad2D);
+
+  FT_Done_Face(renderer->fontFace);
+  FT_Done_FreeType(renderer->fontLibrary);
 }
 
 double step = 0.0;
@@ -189,6 +273,42 @@ void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 co
   glUniform4f(colorL, color.x, color.y, color.z, color.w);
 
   drawShape(&renderer->quad2D);
+}
+
+void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector4 color) {
+  float scale = 1;
+
+  glUseProgram(renderer->shader2DTextured);
+
+  Vector2 pos = position;
+
+  Vector2 windowSize = getWindowSize(renderer);
+
+  for (int i = 0; i < strlen(text); ++i) {
+    char c = text[i];
+    Glyph *g = &renderer->glyphs[c];
+
+    Vector2 characterPos;
+    characterPos.x = pos.x + (renderer->glyphs[c].bearing.x * scale);
+    characterPos.y = pos.y - ((renderer->glyphs[c].size.y - renderer->glyphs[c].bearing.y) * scale);
+
+    Vector2 characterSize;
+    characterSize = vec2(renderer->glyphs[c].size.x * scale, renderer->glyphs[c].size.y * scale);
+
+    renderer->quad2D.size = vec2(2 * (characterSize.x / windowSize.x), 2 * (characterSize.y / windowSize.y));
+    renderer->quad2D.position = vec2((2 * (characterPos.x / windowSize.x)) - 1.0 + (renderer->quad2D.size.x / 2), (2 * (characterPos.y / windowSize.y)) - 1.0 + (renderer->quad2D.size.y / 2));
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, g->textureID);
+
+    Matrix4x4F model = matrix4x4toMatrix4x4F(shapeModelMatrix(&renderer->quad2D));
+    unsigned int modelL = glGetUniformLocation(renderer->shader2DTextured, "model");
+    glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
+
+    drawShape(&renderer->quad2D);
+
+    pos.x += renderer->glyphs[c].advance / 64;
+  }
 }
 
 Vector2 getWindowSize(const RenderInfo *renderer) {

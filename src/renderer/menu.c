@@ -71,6 +71,7 @@ int drawButton(void *c, RenderInfo *renderer) {
     color = button->select; 
   
   renderQuad(renderer, size, position, color);
+  renderText(renderer, "Hello, World!", position, color);
 
   return 0;
 }

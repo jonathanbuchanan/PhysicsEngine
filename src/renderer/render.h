@@ -10,14 +10,27 @@
 #include "model.h"
 #include "menu.h"
 
-typedef GLuint ShaderProgram;
+#define GLYPH_COUNT 128
 
+typedef struct Glyph {
+  GLuint textureID;
+  Vector2 size;
+  Vector2 bearing;
+  double advance;
+} Glyph;
+
+typedef GLuint ShaderProgram;
 typedef struct RenderInfo {
   GLFWwindow *window;
 
-  // Two shaders
+  FT_Library fontLibrary;
+  FT_Face fontFace;
+  Glyph glyphs[GLYPH_COUNT];
+
+  // Shaders
   ShaderProgram shader3D;
   ShaderProgram shader2D;
+  ShaderProgram shader2DTextured;
 
   Model model;
 
@@ -29,6 +42,7 @@ RenderInfo * createRenderer(GLFWwindow *window);
 void freeRenderer(RenderInfo *renderer);
 void render(RenderInfo *renderer);
 void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color);
+void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector4 color);
 
 Vector2 getWindowSize(const RenderInfo *renderer);
 Vector2 getCursorPosition(const RenderInfo *renderer);

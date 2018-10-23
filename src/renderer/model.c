@@ -260,11 +260,12 @@ Model generateIcoSphere(float radius, int subdivisions) {
 Shape generateQuad() {
   Shape q;
 
+  // x, y, u, v
   const float quad_vertices[] = {
-    -1.0, -1.0,
-    -1.0, 1.0,
-    1.0, 1.0,
-    1.0, -1.0
+    -1.0, -1.0, 0.0, 1.0,
+    -1.0, 1.0, 0.0, 0.0,
+    1.0, 1.0, 1.0, 0.0,
+    1.0, -1.0, 1.0, 1.0
   };
 
   const unsigned int quad_indices[] = {
@@ -273,7 +274,7 @@ Shape generateQuad() {
   };
 
   q.vertices = malloc(sizeof(quad_vertices));
-  q.vertices_n = 8;
+  q.vertices_n = 16;
   memcpy(q.vertices, quad_vertices, sizeof(float) * q.vertices_n);
 
   q.indices = malloc(sizeof(quad_indices));
@@ -296,8 +297,11 @@ int loadShape(Shape *s) {
   glBufferData(GL_ARRAY_BUFFER, sizeof(float) * s->vertices_n, s->vertices, GL_STATIC_DRAW);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * s->indices_n, s->indices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
   return 0;
 }

@@ -17,6 +17,8 @@ find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 target_link_libraries(physicsenginerenderer ${FREETYPE_LIBRARIES})
 
+# fontconfig
+
 if(APPLE)
   find_package(OpenGL REQUIRED)
   include_directories(${OPENGL_INCLUDE_DIR})
