@@ -67,6 +67,7 @@ Matrix4x4 rotationYMatrix(double angle);
 Matrix4x4 rotationZMatrix(double angle);
 Vector4 matrix4x4timesVector4(Matrix4x4 a, Vector4 b);
 Matrix4x4 perspectiveProjectionMatrix(double nearPlane, double farPlane, double fovy, double aspect);
+Matrix4x4 orthographicProjectionMatrix(double nearPlane, double farPlane, double left, double right, double bottom, double top);  
 
 typedef struct Matrix4x4F {
   float a11, a12, a13, a14,

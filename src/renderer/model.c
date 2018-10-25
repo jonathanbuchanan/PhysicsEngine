@@ -262,10 +262,10 @@ Shape generateQuad() {
 
   // x, y, u, v
   const float quad_vertices[] = {
-    -1.0, -1.0, 0.0, 1.0,
-    -1.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 1.0,
+    0.0, 1.0, 0.0, 0.0,
     1.0, 1.0, 1.0, 0.0,
-    1.0, -1.0, 1.0, 1.0
+    1.0, 0.0, 1.0, 1.0
   };
 
   const unsigned int quad_indices[] = {
@@ -324,7 +324,7 @@ int drawShape(Shape *s) {
 }
 
 Matrix4x4 shapeModelMatrix(Shape *s) {
-  Matrix4x4 scale = scalingMatrix(vec3(s->size.x / 2.0, s->size.y / 2.0, 0.0));
+  Matrix4x4 scale = scalingMatrix(vec3(s->size.x, s->size.y, 0.0));
   Matrix4x4 translation = translationMatrix(vec3(s->position.x, s->position.y, 0.0));
 
   return MATMUL(translation, scale);

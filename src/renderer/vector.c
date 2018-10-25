@@ -203,6 +203,18 @@ Matrix4x4 perspectiveProjectionMatrix(double zNear, double zFar, double fovy, do
   return result;
 }
 
+Matrix4x4 orthographicProjectionMatrix(double zNear, double zFar, double left, double right, double bottom, double top) {
+  Matrix4x4 result = {0};
+  result.a11 = 2 / (right - left);
+  result.a14 = -1 * ((right + left) / (right - left));
+  result.a22 = 2 / (top - bottom);
+  result.a24 = -1 * ((top + bottom) / (top - bottom));
+  result.a33 = -2 / (zFar - zNear);
+  result.a34 = -1 * ((zFar + zNear) / (zFar - zNear));
+  result.a44 = 1;
+  return result;
+}
+
 Matrix4x4F matrix4x4toMatrix4x4F(Matrix4x4 m) {
   Matrix4x4F result;
   float *outArray = &result.a11;

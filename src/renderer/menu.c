@@ -55,13 +55,6 @@ Control createButton(Vector2 size, Vector2 position) {
 int drawButton(void *c, RenderInfo *renderer) {
   Button *button = (Button *)c;
 
-  Vector2 windowSize = getWindowSize(renderer);
-
-  // Convert pixel coordinates to NDC
-  // Position specifies bottom left coordinates
-  Vector2 size = (Vector2){2 * (button->size.x / windowSize.x), 2 * (button->size.y / windowSize.y)};
-  Vector2 position = (Vector2){(2 * (button->position.x / windowSize.x)) - 1.0 + (size.x / 2), (2 * (button->position.y / windowSize.y)) - 1.0 + (size.y / 2)};
-
   Vector4 color;
   if (button->state == Normal)
     color = button->color;
@@ -70,8 +63,8 @@ int drawButton(void *c, RenderInfo *renderer) {
   else if (button->state == Selected)
     color = button->select; 
   
-  renderQuad(renderer, size, position, color);
-  renderText(renderer, button->text, position, button->textColor);
+  renderQuad(renderer, button->size, button->position, color);
+  renderText(renderer, button->text, button->position, button->textColor);
 
   return 0;
 }
@@ -118,13 +111,6 @@ Control createLabel(Vector2 size, Vector2 position) {
 
 int drawLabel(void *c, RenderInfo *renderer) {
   Label *label = (Label *)c;
-
-  Vector2 windowSize = getWindowSize(renderer);
-
-  // Convert pixel coordinates to NDC
-  // Position specifies bottom left coordinates
-  Vector2 size = (Vector2){2 * (label->size.x / windowSize.x), 2 * (label->size.y / windowSize.y)};
-  Vector2 position = (Vector2){(2 * (label->position.x / windowSize.x)) - 1.0 + (size.x / 2), (2 * (label->position.y / windowSize.y)) - 1.0 + (size.y / 2)};
 
   renderText(renderer, label->text, label->position, label->color);
 

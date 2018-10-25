@@ -31,8 +31,9 @@ static const char *vertex_shader_2D =
 "#version 330 core\n"
 "layout (location = 0) in vec2 pos;\n"
 "uniform mat4 model;\n"
+"uniform mat4 projection;\n"
 "void main() {\n"
-"    gl_Position = model * vec4(pos, 0.0, 1.0);\n"
+"    gl_Position = projection * model * vec4(pos, 0.0, 1.0);\n"
 "}\n";
 
 static const char *fragment_shader_2D =
@@ -50,9 +51,10 @@ static const char *vertex_shader_2D_textured =
 "layout (location = 0) in vec2 pos;\n"
 "layout (location = 1) in vec2 textureCoordinates;\n"
 "uniform mat4 model;\n"
+"uniform mat4 projection;\n"
 "out vec2 texCoords;\n"
 "void main() {\n"
-"    gl_Position = model * vec4(pos, 0.0, 1.0);\n"
+"    gl_Position = projection * model * vec4(pos, 0.0, 1.0);\n"
 "    gl_Position.z = -0.5;\n" // <-- Eliminate this hard-wire
 "    texCoords = textureCoordinates;\n"
 "}\n";
@@ -276,9 +278,15 @@ void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 co
   renderer->quad2D.size = size;
   renderer->quad2D.position = position;
 
+  Vector2 windowSize = getWindowSize(renderer);
+
   Matrix4x4F model = matrix4x4toMatrix4x4F(shapeModelMatrix(&renderer->quad2D));
   unsigned int modelL = glGetUniformLocation(renderer->shader2D, "model");
   glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
+
+  Matrix4x4F projection = matrix4x4toMatrix4x4F(orthographicProjectionMatrix(-1.0, 1.0, 0.0, windowSize.x, 0.0, windowSize.y));
+  unsigned int projectionL = glGetUniformLocation(renderer->shader2D, "projection");
+  glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
 
   unsigned int colorL = glGetUniformLocation(renderer->shader2D, "color");
   glUniform4f(colorL, color.x, color.y, color.z, color.w);
@@ -306,8 +314,8 @@ void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector
     Vector2 characterSize;
     characterSize = vec2(renderer->glyphs[c].size.x * scale, renderer->glyphs[c].size.y * scale);
 
-    renderer->quad2D.size = vec2(2 * (characterSize.x / windowSize.x), 2 * (characterSize.y / windowSize.y));
-    renderer->quad2D.position = vec2((2 * (characterPos.x / windowSize.x)) - 1.0 + (renderer->quad2D.size.x / 2), (2 * (characterPos.y / windowSize.y)) - 1.0 + (renderer->quad2D.size.y / 2));
+    renderer->quad2D.size = characterSize;
+    renderer->quad2D.position = characterPos;
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, g->textureID);
@@ -315,6 +323,10 @@ void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector
     Matrix4x4F model = matrix4x4toMatrix4x4F(shapeModelMatrix(&renderer->quad2D));
     unsigned int modelL = glGetUniformLocation(renderer->shader2DTextured, "model");
     glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
+
+    Matrix4x4F projection = matrix4x4toMatrix4x4F(orthographicProjectionMatrix(-1.0, 1.0, 0.0, windowSize.x, 0.0, windowSize.y));
+    unsigned int projectionL = glGetUniformLocation(renderer->shader2DTextured, "projection");
+    glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
 
     unsigned int colorL = glGetUniformLocation(renderer->shader2DTextured, "color");
     glUniform4f(colorL, color.x, color.y, color.z, color.w);
