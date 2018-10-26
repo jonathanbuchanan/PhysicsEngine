@@ -3,8 +3,8 @@
 #include "render.h"
 #include <stdlib.h>
 
-int drawControl(Control *control, RenderInfo *renderer) {
-  return (control->draw)(control->control, renderer);
+int drawControl(Control *control, RenderInfo *renderer, Vector2 offset) {
+  return (control->draw)(control->control, renderer, offset);
 }
 
 int updateControl(Control *control, RenderInfo *renderer) {
@@ -25,8 +25,11 @@ void addControlToMenu(Menu *menu, Control *control) {
 }
 
 int drawMenu(Menu *menu, RenderInfo *renderer) {
+  // Draw the background
+  renderQuad(renderer, menu->size, menu->position, menu->color);
+
   for (int i = 0; i < menu->controls_n; ++i) {
-    drawControl(menu->controls[i], renderer);
+    drawControl(menu->controls[i], renderer, menu->position);
   }
   return 0;
 }
@@ -52,7 +55,7 @@ Control createButton(Vector2 size, Vector2 position) {
   return c;
 }
 
-int drawButton(void *c, RenderInfo *renderer) {
+int drawButton(void *c, RenderInfo *renderer, Vector2 offset) {
   Button *button = (Button *)c;
 
   Vector4 color;
@@ -63,8 +66,8 @@ int drawButton(void *c, RenderInfo *renderer) {
   else if (button->state == Selected)
     color = button->select; 
   
-  renderQuad(renderer, button->size, button->position, color);
-  renderText(renderer, button->text, button->position, button->textColor);
+  renderQuad(renderer, button->size, addVector2(button->position, offset), color);
+  renderText(renderer, button->text, addVector2(button->position, offset), button->textColor);
 
   return 0;
 }
@@ -109,10 +112,10 @@ Control createLabel(Vector2 size, Vector2 position) {
   return c;
 }
 
-int drawLabel(void *c, RenderInfo *renderer) {
+int drawLabel(void *c, RenderInfo *renderer, Vector2 offset) {
   Label *label = (Label *)c;
 
-  renderText(renderer, label->text, label->position, label->color);
+  renderText(renderer, label->text, addVector2(label->position, offset), label->color);
 
   return 0;
 }

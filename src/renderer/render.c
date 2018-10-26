@@ -150,10 +150,16 @@ void test_callback(Button *b) {
   printf("press\n");
 }
 
+void windowResizeCallback(GLFWwindow *window, int width, int height) {
+  // Resize menus
+}
+
 Control button;
 Control label;
 RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
+
+  glfwSetWindowSizeCallback(window, windowResizeCallback);
 
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
 
@@ -198,6 +204,10 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   loadShape(&renderer->quad2D);
 
   renderer->menu = createMenu();
+  renderer->menu.position = vec2(0.0, 0.0);
+  renderer->menu.size = vec2(100.0, 480.0);
+  renderer->menu.color = vec4(0.8, 0.8, 0.8, 0.5);
+
   button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
   Button *b = getButton(&button);
   b->highlight = vec4(1.0, 1.0, 1.0, 1.0);
@@ -252,7 +262,7 @@ void render(RenderInfo *renderer) {
   unsigned int viewL = glGetUniformLocation(renderer->shader3D, "view");
   glUniformMatrix4fv(viewL, 1, GL_TRUE, (GLfloat *)&view.a11);
 
-  Matrix4x4F projection = matrix4x4toMatrix4x4F(perspectiveProjectionMatrix(0.1, 100.0, DEGREES_TO_RADIANS(45.0), (double)(640.0 / 480.0)));
+  Matrix4x4F projection = matrix4x4toMatrix4x4F(perspectiveProjectionMatrix(0.1, 100.0, DEGREES_TO_RADIANS(45.0), (double)(width) / (double)(height)));
   unsigned int projectionL = glGetUniformLocation(renderer->shader3D, "projection");
   glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
 
