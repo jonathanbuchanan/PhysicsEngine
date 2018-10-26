@@ -26,7 +26,7 @@ void addControlToMenu(Menu *menu, Control *control) {
 
 int drawMenu(Menu *menu, RenderInfo *renderer) {
   // Draw the background
-  renderQuad(renderer, menu->size, menu->position, menu->color);
+  renderQuad(renderer, menu->size, menu->position, menu->color, menu->z_index / Z_INDEX_MAX);
 
   for (int i = 0; i < menu->controls_n; ++i) {
     drawControl(menu->controls[i], renderer, menu->position);
@@ -66,8 +66,8 @@ int drawButton(void *c, RenderInfo *renderer, Vector2 offset) {
   else if (button->state == Selected)
     color = button->select; 
   
-  renderQuad(renderer, button->size, addVector2(button->position, offset), color);
-  renderText(renderer, button->text, addVector2(button->position, offset), button->textColor);
+  renderQuad(renderer, button->size, addVector2(button->position, offset), color, (float)button->z_index / (float)Z_INDEX_MAX);
+  renderText(renderer, button->text, addVector2(button->position, offset), button->textColor, (float)(button->z_index + 1) / (float)Z_INDEX_MAX);
 
   return 0;
 }
@@ -115,7 +115,7 @@ Control createLabel(Vector2 size, Vector2 position) {
 int drawLabel(void *c, RenderInfo *renderer, Vector2 offset) {
   Label *label = (Label *)c;
 
-  renderText(renderer, label->text, addVector2(label->position, offset), label->color);
+  renderText(renderer, label->text, addVector2(label->position, offset), label->color, (float)label->z_index / (float)Z_INDEX_MAX);
 
   return 0;
 }

@@ -32,8 +32,10 @@ static const char *vertex_shader_2D =
 "layout (location = 0) in vec2 pos;\n"
 "uniform mat4 model;\n"
 "uniform mat4 projection;\n"
+"uniform float zPosition;\n"
 "void main() {\n"
 "    gl_Position = projection * model * vec4(pos, 0.0, 1.0);\n"
+"    gl_Position.z = -zPosition;\n"
 "}\n";
 
 static const char *fragment_shader_2D =
@@ -52,10 +54,11 @@ static const char *vertex_shader_2D_textured =
 "layout (location = 1) in vec2 textureCoordinates;\n"
 "uniform mat4 model;\n"
 "uniform mat4 projection;\n"
+"uniform float zPosition;\n"
 "out vec2 texCoords;\n"
 "void main() {\n"
 "    gl_Position = projection * model * vec4(pos, 0.0, 1.0);\n"
-"    gl_Position.z = -0.5;\n" // <-- Eliminate this hard-wire
+"    gl_Position.z = -zPosition;\n"
 "    texCoords = textureCoordinates;\n"
 "}\n";
 
@@ -215,12 +218,14 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   b->action = test_callback;
   b->text = "Button";
   b->textColor = vec4(0.5, 0.5, 0.5, 1.0);
+  b->z_index = 1;
   addControlToMenu(&renderer->menu, &button);
 
-  label = createLabel(vec2(100.0, 100.0), vec2(100.0, 100.0));
+  label = createLabel(vec2(100.0, 100.0), vec2(0.0, 100.0));
   Label *l = getLabel(&label);
   l->color = vec4(1.0, 1.0, 1.0, 1.0);
   l->text = "I am a label.";
+  l->z_index = 1;
   addControlToMenu(&renderer->menu, &label);
 
   return renderer;
@@ -282,7 +287,7 @@ void render(RenderInfo *renderer) {
   glfwPollEvents();
 }
 
-void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color) {
+void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color, double z) {
   glUseProgram(renderer->shader2D);
 
   renderer->quad2D.size = size;
@@ -298,13 +303,16 @@ void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 co
   unsigned int projectionL = glGetUniformLocation(renderer->shader2D, "projection");
   glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
 
+  unsigned int zPositionL = glGetUniformLocation(renderer->shader2D, "zPosition");
+  glUniform1f(zPositionL, z);
+
   unsigned int colorL = glGetUniformLocation(renderer->shader2D, "color");
   glUniform4f(colorL, color.x, color.y, color.z, color.w);
 
   drawShape(&renderer->quad2D);
 }
 
-void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector4 color) {
+void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector4 color, double z) {
   float scale = 1;
 
   glUseProgram(renderer->shader2DTextured);
@@ -340,6 +348,9 @@ void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector
 
     unsigned int colorL = glGetUniformLocation(renderer->shader2DTextured, "color");
     glUniform4f(colorL, color.x, color.y, color.z, color.w);
+
+    unsigned int zPositionL = glGetUniformLocation(renderer->shader2DTextured, "zPosition");
+    glUniform1f(zPositionL, z);
 
     drawShape(&renderer->quad2D);
 

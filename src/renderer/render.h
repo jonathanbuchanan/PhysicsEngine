@@ -41,8 +41,8 @@ typedef struct RenderInfo {
 RenderInfo * createRenderer(GLFWwindow *window);
 void freeRenderer(RenderInfo *renderer);
 void render(RenderInfo *renderer);
-void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color);
-void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector4 color);
+void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color, double z);
+void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector4 color, double z);
 
 Vector2 getWindowSize(const RenderInfo *renderer);
 Vector2 getCursorPosition(const RenderInfo *renderer);

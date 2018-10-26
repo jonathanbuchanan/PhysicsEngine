@@ -17,6 +17,10 @@ typedef enum MenuOrientation {
   Central = 2
 } MenuOrientation;
 
+#define Z_INDEX_MAX 127
+
+
+
 typedef struct Control {
   void *control;
   int (* draw)(void *control, RenderInfo *renderer, Vector2 offset);
@@ -30,6 +34,8 @@ typedef struct Menu {
   MenuOrientation orientation;
   Vector2 size;
   Vector2 position;
+  unsigned int z_index;
+
   Vector4 color;
 
   Control **controls;
@@ -47,6 +53,7 @@ typedef struct Button {
 
   Vector2 size;
   Vector2 position;
+  unsigned int z_index;
 
   Vector4 color;
   Vector4 highlight;
@@ -67,6 +74,7 @@ Button * getButton(Control *button);
 typedef struct Label {
   Vector2 size;
   Vector2 position;
+  unsigned int z_index;
 
   Vector4 color;
 
