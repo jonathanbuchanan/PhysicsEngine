@@ -9,28 +9,18 @@
 
 #include "model.h"
 #include "menu.h"
-
-#define GLYPH_COUNT 128
-
-typedef struct Glyph {
-  GLuint textureID;
-  Vector2 size;
-  Vector2 bearing;
-  double advance;
-} Glyph;
+#include "text.h"
 
 typedef GLuint ShaderProgram;
 typedef struct RenderInfo {
   GLFWwindow *window;
 
-  FT_Library fontLibrary;
-  FT_Face fontFace;
-  Glyph glyphs[GLYPH_COUNT];
-
   // Shaders
   ShaderProgram shader3D;
   ShaderProgram shader2D;
   ShaderProgram shader2DTextured;
+
+  TextRenderInfo textRenderer;
 
   Model model;
 

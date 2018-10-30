@@ -1,6 +1,7 @@
 #include "menu.h"
 
 #include "render.h"
+#include "text.h"
 #include <stdlib.h>
 
 int drawControl(Control *control, RenderInfo *renderer) {
@@ -71,7 +72,7 @@ int drawButton(void *c, RenderInfo *renderer) {
     color = button->select; 
   
   renderQuad(renderer, size, position, color);
-  renderText(renderer, button->text, position, button->textColor);
+  drawText(renderer, button->text, position, size, 1, button->textColor);
 
   return 0;
 }
@@ -126,7 +127,8 @@ int drawLabel(void *c, RenderInfo *renderer) {
   Vector2 size = (Vector2){2 * (label->size.x / windowSize.x), 2 * (label->size.y / windowSize.y)};
   Vector2 position = (Vector2){(2 * (label->position.x / windowSize.x)) - 1.0 + (size.x / 2), (2 * (label->position.y / windowSize.y)) - 1.0 + (size.y / 2)};
 
-  renderText(renderer, label->text, label->position, label->color);
+  drawText(renderer, label->text, label->position, label->size, 1, label->color);
+  //renderText(renderer, label->text, label->position, label->color);
 
   return 0;
 }

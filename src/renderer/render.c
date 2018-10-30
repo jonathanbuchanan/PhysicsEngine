@@ -101,49 +101,6 @@ ShaderProgram compileShader(const char *vertex_shader_source, const char *fragme
   return program;
 }
 
-int loadFont(RenderInfo *renderer) {
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);  
-
-  int error = FT_Init_FreeType(&renderer->fontLibrary);
-  if (error)
-    return -1;
-
-  error = FT_New_Face(renderer->fontLibrary, "/Library/Fonts/Arial.ttf", 0, &renderer->fontFace);
-  if (error)
-    return -1;
-
-  error = FT_Set_Pixel_Sizes(renderer->fontFace, 0, 48);
-  if (error)
-    return -1;
-
-  for (int c = 0; c < GLYPH_COUNT; ++c) {
-    error = FT_Load_Char(renderer->fontFace, c, FT_LOAD_RENDER);
-    if (error)
-      return -1;
-
-    Glyph g;
-
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, renderer->fontFace->glyph->bitmap.width, renderer->fontFace->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, renderer->fontFace->glyph->bitmap.buffer);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    g.textureID = texture;
-    g.size = vec2(renderer->fontFace->glyph->bitmap.width, renderer->fontFace->glyph->bitmap.rows);
-    g.bearing = vec2(renderer->fontFace->glyph->bitmap_left, renderer->fontFace->glyph->bitmap_top);
-    g.advance = renderer->fontFace->glyph->advance.x;
-
-    renderer->glyphs[c] = g;
-  }
-
-  return 0;
-}
-
 void test_callback(Button *b) {
   printf("press\n");
 }
@@ -155,15 +112,13 @@ RenderInfo * createRenderer(GLFWwindow *window) {
 
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
 
-  if (loadFont(renderer) == -1)
-    return NULL;
+  renderer->textRenderer = initTextRenderer();
 
   renderer->window = window;
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
-
 
   GLuint vao;
   glGenVertexArrays(1, &vao);
@@ -218,8 +173,7 @@ void freeRenderer(RenderInfo *renderer) {
   freeModel(&renderer->model);
   freeShape(&renderer->quad2D);
 
-  FT_Done_Face(renderer->fontFace);
-  FT_Done_FreeType(renderer->fontLibrary);
+  destroyTextRenderer(&renderer->textRenderer);
 }
 
 double step = 0.0;
@@ -284,45 +238,6 @@ void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 co
   glUniform4f(colorL, color.x, color.y, color.z, color.w);
 
   drawShape(&renderer->quad2D);
-}
-
-void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector4 color) {
-  float scale = 1;
-
-  glUseProgram(renderer->shader2DTextured);
-
-  Vector2 pos = position;
-
-  Vector2 windowSize = getWindowSize(renderer);
-
-  for (int i = 0; i < strlen(text); ++i) {
-    char c = text[i];
-    Glyph *g = &renderer->glyphs[c];
-
-    Vector2 characterPos;
-    characterPos.x = pos.x + (renderer->glyphs[c].bearing.x * scale);
-    characterPos.y = pos.y - ((renderer->glyphs[c].size.y - renderer->glyphs[c].bearing.y) * scale);
-
-    Vector2 characterSize;
-    characterSize = vec2(renderer->glyphs[c].size.x * scale, renderer->glyphs[c].size.y * scale);
-
-    renderer->quad2D.size = vec2(2 * (characterSize.x / windowSize.x), 2 * (characterSize.y / windowSize.y));
-    renderer->quad2D.position = vec2((2 * (characterPos.x / windowSize.x)) - 1.0 + (renderer->quad2D.size.x / 2), (2 * (characterPos.y / windowSize.y)) - 1.0 + (renderer->quad2D.size.y / 2));
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, g->textureID);
-
-    Matrix4x4F model = matrix4x4toMatrix4x4F(shapeModelMatrix(&renderer->quad2D));
-    unsigned int modelL = glGetUniformLocation(renderer->shader2DTextured, "model");
-    glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
-
-    unsigned int colorL = glGetUniformLocation(renderer->shader2DTextured, "color");
-    glUniform4f(colorL, color.x, color.y, color.z, color.w);
-
-    drawShape(&renderer->quad2D);
-
-    pos.x += renderer->glyphs[c].advance / 64;
-  }
 }
 
 Vector2 getWindowSize(const RenderInfo *renderer) {
