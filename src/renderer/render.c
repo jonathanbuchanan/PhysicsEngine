@@ -158,12 +158,14 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   b->action = test_callback;
   b->text = "Button";
   b->textColor = vec4(0.5, 0.5, 0.5, 1.0);
+  b->textHeight = 32;
   addControlToMenu(&renderer->menu, &button);
 
   label = createLabel(vec2(100.0, 100.0), vec2(100.0, 100.0));
   Label *l = getLabel(&label);
   l->color = vec4(1.0, 1.0, 1.0, 1.0);
   l->text = "I am a label.";
+  l->textHeight = 64;
   addControlToMenu(&renderer->menu, &label);
 
   return renderer;

@@ -15,7 +15,7 @@ TextRenderInfo initTextRenderer() {
   /*if (error)
     return -1;*/
 
-  error = FT_Set_Pixel_Sizes(textRenderer.face, 0, 48);
+  error = FT_Set_Pixel_Sizes(textRenderer.face, 0, FONT_SIZE);
   /*if (error)
     return -1;*/
 
@@ -87,6 +87,6 @@ void drawText(RenderInfo *renderer, const char *text, Vector2 position, Vector2 
 
     drawShape(&renderer->quad2D);
 
-    pos.x += textRenderer->glyphs[c].advance / 64;
+    pos.x += (textRenderer->glyphs[c].advance * scale) / 64;
   }
 }

@@ -72,7 +72,7 @@ int drawButton(void *c, RenderInfo *renderer) {
     color = button->select; 
   
   renderQuad(renderer, size, position, color);
-  drawText(renderer, button->text, position, size, 1, button->textColor);
+  drawText(renderer, button->text, position, size, (float)button->textHeight / (float)FONT_SIZE, button->textColor);
 
   return 0;
 }
@@ -124,11 +124,7 @@ int drawLabel(void *c, RenderInfo *renderer) {
 
   // Convert pixel coordinates to NDC
   // Position specifies bottom left coordinates
-  Vector2 size = (Vector2){2 * (label->size.x / windowSize.x), 2 * (label->size.y / windowSize.y)};
-  Vector2 position = (Vector2){(2 * (label->position.x / windowSize.x)) - 1.0 + (size.x / 2), (2 * (label->position.y / windowSize.y)) - 1.0 + (size.y / 2)};
-
-  drawText(renderer, label->text, label->position, label->size, 1, label->color);
-  //renderText(renderer, label->text, label->position, label->color);
+  drawText(renderer, label->text, label->position, label->size, (float)label->textHeight / (float)FONT_SIZE, label->color);
 
   return 0;
 }

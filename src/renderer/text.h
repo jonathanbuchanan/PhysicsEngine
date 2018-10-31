@@ -6,6 +6,10 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+// The font height in pixels
+#define FONT_SIZE 64
+
+// The number of glyphs loaded
 #define GLYPH_COUNT 128
 
 typedef struct RenderInfo RenderInfo;
@@ -27,7 +31,6 @@ TextRenderInfo initTextRenderer();
 void destroyTextRenderer(TextRenderInfo *textRenderer);
 
 // This is an implementation of the Unicode Line Breaking Algorithm
-
 typedef enum LineBreakClass {
   BK, // Mandatory Break
   CR, // Carriage Return
@@ -59,8 +62,74 @@ typedef enum LineBreakClass {
   NU, // Numeric
   PO, // Postfix Numeric
   PR, // Prefix Numeric
-  SY  // Symbols Allowing Break After
+  SY, // Symbols Allowing Break After
+
+  AI, // Ambiguous
+  AL, // Alphabetic
+  CJ, // Conditional Japanese Starter
+  EB, // Emoji Base
+  EM, // Emoji modifier
+  H2, // Hangul LV Symbol
+  H3, // Hangul LVT Symbol
+  HL, // Hebrew Letter
+  ID, // Ideographic
+  JL, // Hangul L Jamo
+  JV, // Hangul V Jamo
+  JT, // Hangul T Jamo
+  RI, // Regional Indicator
+  SA, // Complex Context Dependent (South East Asian)
+  XX  // Unknown  
 } LineBreakClass;
+
+/*typedef enum LineBreakOpportunityType {
+  Prohibited,
+  Indirect,
+  ProhibitedForCombiningMarks,
+  IndirectForCombinbingMarksFollowingSpace,
+  Direct
+} LineBreakOpportunityType;
+
+#define PRD_BO Prohibited
+#define IDT_BO Indirect
+#define PCM_BO ProhibitedForCombiningMarks
+#define ICM_BO IndirectForCombiningMarksFollowingSpace
+#define DCT_BO Direct
+
+// Pair Table Index
+#define PAIR_TABLE_SIZE 29
+static const LineBreakClass pairTableIndex[] = {
+  OP,
+  CL,
+  CP,
+  QU,
+  GL,
+  NS,
+  EX,
+  SY,
+  IS,
+  PR,
+  PO,
+  NU,
+  AL,
+  HL,
+  ID,
+  IN,
+  HY,
+  BA,
+  BB,
+  B2,
+  ZW,
+  CM,
+  WJ,
+  H2,
+  H3,
+  JL,
+  JV,
+  JT,
+  RI
+};*/
+
+#include "pairtable.h"
 
 void drawText(RenderInfo *renderer, const char *text, Vector2 position, Vector2 size, float scale, Vector4 color);
 
