@@ -148,6 +148,8 @@ int lineBreaks(const char *text) {
   // LB1
   unsigned int length = strlen(text);
   LineBreakClass *lineBreakClasses = malloc(sizeof(LineBreakClass) * length);
+  OpportunityType *opportunities = malloc(sizeof(OpportunityType) * (length + 1));
+  memset(opportunities, 0, (length + 1) * sizeof(OpportunityType));
   for (int i = 0; i < length; ++i) {
     LineBreakClass class = getLineBreakClass(text[i]);
     // Resolve certain classes
@@ -162,8 +164,379 @@ int lineBreaks(const char *text) {
     lineBreakClasses[i] = class;
   }
 
+  // LB2
+  opportunities[0] = Unallowed;
+
+  // LB3
+  opportunities[length] = Mandatory;
+
+  // LB4
   for (int i = 0; i < length; ++i) {
-    printf("class: %d\n", lineBreakClasses[i]);
+    if (lineBreakClasses[i] == BK)
+      opportunities[i + 1] = Mandatory;
+  }
+
+  // LB5
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == CR)
+      opportunities[i + 1] = Mandatory;
+    else if (lineBreakClasses[i] == LF)
+      opportunities[i + 1] = Mandatory;
+    else if (lineBreakClasses[i] == NL)
+      opportunities[i + 1] = Mandatory;
+
+
+    if (i != length - 1) { // Can there be a 'next' character?
+      if (lineBreakClasses[i] == CR && lineBreakClasses[i + 1] == LF) {
+        opportunities[i + 1] = Unallowed;
+        opportunities[i + 2] = Mandatory;
+      }
+    }
+  }
+
+  // LB6
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == BK || lineBreakClasses[i] == CR || lineBreakClasses[i] == LF || lineBreakClasses[i] == NL)
+      opportunities[i] = Unallowed;
+  }
+
+  // LB7
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == SP || lineBreakClasses[i] == ZW)
+      opportunities[i] = Unallowed;
+  }
+
+  // LB8
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == ZW) {
+      int breakpoint = i + 1;
+      while (lineBreakClasses[breakpoint] == SP || breakpoint < length) {
+        opportunities[breakpoint] = Permitted; // <--- check this again
+        ++breakpoint;
+      }
+    }
+  }
+
+  // LB9
+  // LB10
+
+  // LB11
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == WJ) {
+      opportunities[i] = Unallowed;
+      opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB12
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == GL)
+      opportunities[i + 1] = Unallowed;
+  }
+
+  // LB12a
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] != SP && lineBreakClasses[i] != BA && lineBreakClasses[i] != HY && i + 1 < length) {
+      if (lineBreakClasses[i + 1] == GL)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB13
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == CL || lineBreakClasses[i] == CP || lineBreakClasses[i] == EX || lineBreakClasses[i] == IS || lineBreakClasses[i] == SY)
+      opportunities[i] = Unallowed;
+  }
+
+  // LB14
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == OP) {
+      int breakpoint = i + 1;
+      while (lineBreakClasses[breakpoint] == SP || breakpoint < length) {
+        opportunities[breakpoint] = Unallowed; //
+        ++breakpoint;
+      }
+    }
+  }
+
+  // LB15
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == QU) {
+      // Search for OP
+      int ruleActive = 0;
+      int location = i + 1;
+      while (lineBreakClasses[location] == SP && location < length) {
+        if (location + 1 < length && lineBreakClasses[location] == OP) {
+          ruleActive = 1;
+          break;
+        }
+        ++location;
+      }
+
+      if (ruleActive) {
+        location = i + 1;
+        while (lineBreakClasses[location] == SP && location < length) {
+          opportunities[location + 1] = Unallowed;
+          if (location + 1 < length && lineBreakClasses[location] == OP)
+            break;
+          ++location;
+        }
+      }
+    }
+  }
+
+  // LB16
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == CL || lineBreakClasses[i] == CP) {
+      int ruleActive = 0;
+      int location = i + 1;
+      while (lineBreakClasses[location] == SP && location < length) {
+        if (location + 1 < length && lineBreakClasses[location] == NS) {
+          ruleActive = 1;
+          break;
+        }
+        ++location;
+      }
+
+      if (ruleActive) {
+        location = i + 1;
+        while (lineBreakClasses[location] == SP && location < length) {
+          opportunities[location + 1] = Unallowed;
+          if (location + 1 < length && lineBreakClasses[location] == NS)
+            break;
+          ++location;
+        }
+      }
+    }
+  }
+
+  // LB17
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == B2) {
+      int ruleActive = 0;
+      int location = i + 1;
+      while (lineBreakClasses[location] == SP && location < length) {
+        if (location + 1 < length && lineBreakClasses[location] == B2) {
+          ruleActive = 1;
+          break;
+        }
+        ++location;
+      }
+      // What if no spaces? look at 15 and 16
+
+      if (ruleActive) {
+        location = i + 1;
+        while (lineBreakClasses[location] == SP && location < length) {
+          opportunities[location + 1] = Unallowed;
+          if (location + 1 < length && lineBreakClasses[location] == B2)
+            break;
+          ++location;
+        }
+      }
+    }
+  }
+
+  // LB18
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == SP)
+      opportunities[i + 1] = Permitted;
+  }
+
+  // LB19
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == QU) {
+      opportunities[i] = Unallowed;
+      opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB20
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == CB) {
+      opportunities[i] = Permitted;
+      opportunities[i + 1] = Permitted;
+    }
+  }
+
+  // LB21
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == BA || lineBreakClasses[i] == HY || lineBreakClasses[i] == NS)
+      opportunities[i] = Unallowed;
+    else if (lineBreakClasses[i] == BB)
+      opportunities[i + 1] = Unallowed;
+  }
+
+  // LB21a
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == HL) {
+      if (i + 1 < length && (lineBreakClasses[i + 1] == HY || lineBreakClasses[i + 1] == BA))
+        opportunities[i + 2] = Unallowed;
+    }
+  }
+
+  // LB21b
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == SY) {
+      if (i + 1 < length && lineBreakClasses[i + 1] == HL)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB22
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == AL || lineBreakClasses[i] == HL || lineBreakClasses[i] == EX || lineBreakClasses[i] == ID || lineBreakClasses[i] == EB || lineBreakClasses[i] == EM || lineBreakClasses[i] == IN || lineBreakClasses[i] == NU) {
+      if (i + 1 < length && lineBreakClasses[i + 1] == IN)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB23
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == AL || lineBreakClasses[i] == HL) {
+      if (i + 1 < length && lineBreakClasses[i + 1] == NU)
+        opportunities[i + 1] = Unallowed;
+    } else if (lineBreakClasses[i] == NU) {
+      if (i + 1 < length && (lineBreakClasses[i + 1] == AL || lineBreakClasses[i + 1] == HL))
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB23a
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == PR) {
+      if (i + 1 < length && (lineBreakClasses[i + 1] == ID || lineBreakClasses[i + 1] == EB || lineBreakClasses[i + 1] == EM))
+        opportunities[i + 1] = Unallowed;
+    } else if (lineBreakClasses[i] == ID || lineBreakClasses[i] == EB || lineBreakClasses[i] == EM) {
+      if (i + 1 < length && lineBreakClasses[i + 1] == PO)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB24
+  for (int i = 0; i < length; ++i) {
+    if (lineBreakClasses[i] == PR || lineBreakClasses[i] == PO) {
+      if (i + 1 < length && (lineBreakClasses[i + 1] == AL || lineBreakClasses[i + 1] == HL))
+        opportunities[i + 1] = Unallowed;
+    } else if (lineBreakClasses[i] == AL || lineBreakClasses[i] == HL) {
+      if (i + 1 < length && (lineBreakClasses[i + 1] == PR || lineBreakClasses[i + 1] == PO))
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB25
+  for (int i = 0; i < length; ++i) {
+    if (i + 1 >= length)
+      continue;
+    if ((lineBreakClasses[i] == CL && lineBreakClasses[i + 1] == PO) ||
+        (lineBreakClasses[i] == CP && lineBreakClasses[i + 1] == PO) ||
+        (lineBreakClasses[i] == CL && lineBreakClasses[i + 1] == PR) ||
+        (lineBreakClasses[i] == CP && lineBreakClasses[i + 1] == PR) ||
+        (lineBreakClasses[i] == NU && lineBreakClasses[i + 1] == PO) ||
+        (lineBreakClasses[i] == NU && lineBreakClasses[i + 1] == PR) ||
+        (lineBreakClasses[i] == PO && lineBreakClasses[i + 1] == OP) ||
+        (lineBreakClasses[i] == PO && lineBreakClasses[i + 1] == NU) ||
+        (lineBreakClasses[i] == PR && lineBreakClasses[i + 1] == OP) ||
+        (lineBreakClasses[i] == PR && lineBreakClasses[i + 1] == NU) ||
+        (lineBreakClasses[i] == HY && lineBreakClasses[i + 1] == NU) ||
+        (lineBreakClasses[i] == IS && lineBreakClasses[i + 1] == NU) ||
+        (lineBreakClasses[i] == NU && lineBreakClasses[i + 1] == NU) ||
+        (lineBreakClasses[i] == SY && lineBreakClasses[i + 1] == NU))
+      opportunities[i + 1] = Unallowed;
+  }
+
+  // LB26
+  for (int i = 0; i < length; ++i) {
+    if (i + 1 >= length)
+      continue;
+    if (lineBreakClasses[i] == JL) {
+      if (lineBreakClasses[i + 1] == JL || lineBreakClasses[i + 1] == JV || lineBreakClasses[i + 1] == H2 || lineBreakClasses[i + 1] == H3)
+        opportunities[i + 1] = Unallowed;
+    } else if (lineBreakClasses[i] == JV || lineBreakClasses[i] == H2) {
+      if (lineBreakClasses[i + 1] == JV || lineBreakClasses[i + 1] == JT)
+        opportunities[i + 1] = Unallowed;
+    } else if (lineBreakClasses[i] == JT || lineBreakClasses[i] == H3) {
+      if (lineBreakClasses[i + 1] == JT)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB27
+  for (int i = 0; i < length; ++i) {
+    if (i + 1 >= length)
+      continue;
+    if (lineBreakClasses[i] == JL || lineBreakClasses[i] == JV || lineBreakClasses[i] == JT || lineBreakClasses[i] == H2 || lineBreakClasses[i] == H3) {
+      if (lineBreakClasses[i + 1] == IN || lineBreakClasses[i + 1] == PO)
+        opportunities[i + 1] = Unallowed;
+    } else if (lineBreakClasses[i] == PR) {
+      if (lineBreakClasses[i + 1] == JL || lineBreakClasses[i + 1] == JV || lineBreakClasses[i + 1] == JT || lineBreakClasses[i + 1] == H2 || lineBreakClasses[i + 1] == H3)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB28
+  for (int i = 0; i < length; ++i) {
+    if (i + 1 >= length)
+      continue;
+    if (lineBreakClasses[i] == AL || lineBreakClasses[i] == HL) {
+      if (lineBreakClasses[i + 1] == AL || lineBreakClasses[i + 1] == HL)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB29
+  for (int i = 0; i < length; ++i) {
+    if (i + 1 >= length)
+      continue;
+    if (lineBreakClasses[i] == IS) {
+      if (lineBreakClasses[i + 1] == AL || lineBreakClasses[i + 1] == HL)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB30
+  for (int i = 0; i < length; ++i) {
+    if (i + 1 >= length)
+      continue;
+    if (lineBreakClasses[i] == AL || lineBreakClasses[i] == HL || lineBreakClasses[i] == NU) {
+      if (lineBreakClasses[i + 1] == OP)
+        opportunities[i + 1] = Unallowed;
+    } else if (lineBreakClasses[i] == CP) {
+      if (lineBreakClasses[i + 1] == AL || lineBreakClasses[i + 1] == HL || lineBreakClasses[i + 1] == NU)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB30a
+  for (int i = 0; i < length; ++i) {
+    if (i + 1 >= length)
+      continue;
+    if (lineBreakClasses[i] == RI && lineBreakClasses[i + 1] == RI) {
+      int location = i - 1;
+      int ricount = 0;
+      while (location >= 0 && lineBreakClasses[location] == RI) {
+        ++ricount;
+        --location;
+      }
+      if (ricount % 2 == 0)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB30b
+  for (int i = 0; i < length; ++i) {
+    if (i + 1 >= length)
+      continue;
+    if (lineBreakClasses[i] == EB) {
+      if (lineBreakClasses[i + 1] == EM)
+        opportunities[i + 1] = Unallowed;
+    }
+  }
+
+  // LB31
+
+  printf("break action: %d\n", opportunities[0]);
+  for (int i = 0; i < length; ++i) {
+    printf("break action: %c %d\n", text[i], opportunities[i + 1]);
   }
 
   return 0;

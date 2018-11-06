@@ -84,6 +84,12 @@ typedef enum LineBreakClass {
 } LineBreakClass;
 LineBreakClass getLineBreakClass(int c);
 
+typedef enum OpportunityType {
+  Mandatory = 0,  // !
+  Unallowed = 1,  // X
+  Permitted = 2   // /
+} OpportunityType;
+
 int lineBreaks(const char *text);
 
 void drawText(RenderInfo *renderer, const char *text, Vector2 position, Vector2 size, float scale, Vector4 color);
