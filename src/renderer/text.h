@@ -90,7 +90,7 @@ typedef enum OpportunityType {
   Permitted = 2   // /
 } OpportunityType;
 
-int lineBreaks(const char *text);
+OpportunityType * lineBreaks(const char *text);
 
 void drawText(RenderInfo *renderer, const char *text, Vector2 position, Vector2 size, float scale, Vector4 color);
 

@@ -144,7 +144,7 @@ LineBreakClass getLineBreakClass(int c) {
   return XX;
 }
 
-int lineBreaks(const char *text) {
+OpportunityType * lineBreaks(const char *text) {
   // LB1
   unsigned int length = strlen(text);
   LineBreakClass *lineBreakClasses = malloc(sizeof(LineBreakClass) * length);
@@ -534,12 +534,7 @@ int lineBreaks(const char *text) {
 
   // LB31
 
-  printf("break action: %d\n", opportunities[0]);
-  for (int i = 0; i < length; ++i) {
-    printf("break action: %c %d\n", text[i], opportunities[i + 1]);
-  }
-
-  return 0;
+  return opportunities;
 }
 
 void drawText(RenderInfo *renderer, const char *text, Vector2 position, Vector2 size, float scale, Vector4 color) {
