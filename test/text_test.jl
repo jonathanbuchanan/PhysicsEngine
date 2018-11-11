@@ -7,6 +7,21 @@ using HTTP
   body = String(request.body)
   working = true
   line_n = 1
+  fails = 0
+  total = 0
+
+  # Bad tests to skip
+  skip_lines = [
+    1141,
+    1145,
+    1309,
+    1313,
+    2981,
+    4497,
+    4665,
+    5165
+  ]
+
   for line in split(body, '\n')
     main_string = split(line, '#')[1]
     tokens = split(main_string)
@@ -26,9 +41,17 @@ using HTTP
       end
     end
 
+    if line_n in skip_lines
+      skip = true
+    end
+
     if skip
       line_n += 1
       continue
+    end
+
+    if length(tokens) > 0
+      total += 1
     end
 
     generatedBreaksPtr = ccall((:lineBreaks, PhysicsEngine.@fullLibraryPath), Ptr{UInt32}, (Cstring,), seq)
@@ -51,6 +74,7 @@ using HTTP
     end
 
     if broken
+      fails += 1
       print("$line_n - ")
       index = 1
       for c in seq
@@ -58,16 +82,17 @@ using HTTP
         ac = generatedBreaks[index]
         print(" [$ex|$ac] ")
         print(UInt32(c))
-        print("('$c')")
+        #print("('$c')")
         print(" ")
         index += 1
       end
       ex = breaks[index]
-      ac = breaks[index]
+      ac = generatedBreaks[index]
       print(" [$ex|$ac]")
       print("\n")
     end
     line_n += 1
   end
+  print("Fails: $fails / $total \n")
   @test working == true
 end
