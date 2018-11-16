@@ -176,6 +176,10 @@ RenderInfo * createRenderer(GLFWwindow *window) {
 
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
 
+  renderer->input.chars = NULL;
+  renderer->input.actions = NULL;
+  renderer->input.callbacks = NULL;
+
   glfwSetWindowUserPointer(window, renderer);
 
   if (loadFont(renderer) == -1)
