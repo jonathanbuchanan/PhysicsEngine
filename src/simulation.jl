@@ -11,6 +11,18 @@ function simulate()
   Renderer.init()
   window = Renderer.createWindow(windowWidth, windowHeight, windowTitle)
   renderer = Renderer.createRenderer(window)
+
+  function a_cback(key)
+    println("'A' key pressed")
+  end
+
+  function b_cback(key)
+    println("'B' key pressed")
+  end
+
+  Renderer.addKeyCallback(renderer, a_cback, Renderer.KeyA, Renderer.Press)
+  Renderer.addKeyCallback(renderer, b_cback, Renderer.KeyB, Renderer.Press)
+
   while Renderer.windowCloseStatus(window) != true
     Renderer.render(renderer)
   end

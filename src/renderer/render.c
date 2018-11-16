@@ -153,6 +153,15 @@ void test_callback(Button *b) {
   printf("press\n");
 }
 
+void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+  RenderInfo *renderer = (RenderInfo *)glfwGetWindowUserPointer(window);
+  for (int i = 0; i < renderer->input.callbacks_n; ++i) {
+    if (key == renderer->input.chars[i] && action == renderer->input.actions[i]) {
+      renderer->input.callbacks[i](key);
+    }
+  }
+}
+
 void windowResizeCallback(GLFWwindow *window, int width, int height) {
   // Resize menus
 }
@@ -163,8 +172,11 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
 
   glfwSetWindowSizeCallback(window, windowResizeCallback);
+  glfwSetKeyCallback(window, keyCallback);
 
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
+
+  glfwSetWindowUserPointer(window, renderer);
 
   if (loadFont(renderer) == -1)
     return NULL;
@@ -392,5 +404,17 @@ void swapBuffers(GLFWwindow *window) {
 void setClearColor(GLFWwindow *window, float red, float green, float blue, float alpha) {
   glfwMakeContextCurrent(window);
   glClearColor(red, green, blue, alpha);
+}
+
+void addKeyCallback(RenderInfo *renderer, char key, int action, KeyCallbackFunction callback) {
+  renderer->input.callbacks_n += 1;
+
+  renderer->input.chars = realloc(renderer->input.chars, renderer->input.callbacks_n * sizeof(char));
+  renderer->input.actions = realloc(renderer->input.actions, renderer->input.callbacks_n * sizeof(int));
+  renderer->input.callbacks = realloc(renderer->input.callbacks, renderer->input.callbacks_n * sizeof(KeyCallbackFunction));
+
+  renderer->input.chars[renderer->input.callbacks_n - 1] = key;
+  renderer->input.actions[renderer->input.callbacks_n - 1] = action;
+  renderer->input.callbacks[renderer->input.callbacks_n - 1] = callback;
 }
 
