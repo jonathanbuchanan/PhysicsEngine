@@ -19,6 +19,10 @@ function windowCloseStatus(window::Window)
   return ccall((:windowCloseStatus, @fullLibraryPath), Bool, (Window,), window)
 end
 
+function closeWindow(window::Window)
+  return ccall((:closeWindow, @fullLibraryPath), Cvoid, (Window,), window)
+end
+
 function terminate(renderer::RenderInfo)
   ccall((:terminate, @fullLibraryPath), Cvoid, (RenderInfo,), renderer)
 end

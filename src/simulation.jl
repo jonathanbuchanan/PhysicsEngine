@@ -13,7 +13,7 @@ function simulate()
   renderer = Renderer.createRenderer(window)
 
   function esc_callback(key)
-    println("'esc' key pressed")
+    Renderer.closeWindow(window)
   end
 
   Renderer.addKeyCallback(renderer, esc_callback, Renderer.Escape, Renderer.Press)
