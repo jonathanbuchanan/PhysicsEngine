@@ -410,11 +410,11 @@ void setClearColor(GLFWwindow *window, float red, float green, float blue, float
   glClearColor(red, green, blue, alpha);
 }
 
-void addKeyCallback(RenderInfo *renderer, char key, int action, KeyCallbackFunction callback) {
+void addKeyCallback(RenderInfo *renderer, Key key, KeyAction action, KeyCallbackFunction callback) {
   renderer->input.callbacks_n += 1;
 
-  renderer->input.chars = realloc(renderer->input.chars, renderer->input.callbacks_n * sizeof(char));
-  renderer->input.actions = realloc(renderer->input.actions, renderer->input.callbacks_n * sizeof(int));
+  renderer->input.chars = realloc(renderer->input.chars, renderer->input.callbacks_n * sizeof(Key));
+  renderer->input.actions = realloc(renderer->input.actions, renderer->input.callbacks_n * sizeof(KeyAction));
   renderer->input.callbacks = realloc(renderer->input.callbacks, renderer->input.callbacks_n * sizeof(KeyCallbackFunction));
 
   renderer->input.chars[renderer->input.callbacks_n - 1] = key;

@@ -151,8 +151,8 @@ typedef enum KeyAction {
 
 typedef void(* KeyCallbackFunction)(int);
 typedef struct InputInfo {
-  char *chars;
-  int *actions;
+  Key *chars;
+  KeyAction *actions;
   KeyCallbackFunction *callbacks;
 
   int callbacks_n;
@@ -192,6 +192,6 @@ void clear(GLFWwindow *window);
 void swapBuffers(GLFWwindow *window);
 void setClearColor(GLFWwindow *window, float red, float green, float blue, float alpha);
 
-void addKeyCallback(RenderInfo *renderer, char key, int action, KeyCallbackFunction callback);
+void addKeyCallback(RenderInfo *renderer, Key key, KeyAction action, KeyCallbackFunction callback);
 
 #endif
