@@ -256,6 +256,55 @@ Model generateIcoSphere(float radius, int subdivisions) {
   return model;
 }
 
+Model generateCube(float size) {
+  Model model;
+
+  float vertices[] = {
+    -1.0, -1.0, -1.0,
+    -1.0, -1.0, 1.0,
+    -1.0, 1.0, -1.0,
+    -1.0, 1.0, 1.0,
+    1.0, -1.0, -1.0,
+    1.0, -1.0, 1.0,
+    1.0, 1.0, -1.0,
+    1.0, 1.0, 1.0
+  };
+
+  for (int i = 0; i < 3 * 8; ++i) {
+    vertices[i] = vertices[i] * size;
+  }
+
+  model.vertices_n = 3 * 8;
+  model.vertices = malloc(sizeof(float) * 3 * 8);
+  memcpy(model.vertices, vertices, 3 * 8 * sizeof(float));
+
+  unsigned int indices[] = {
+    0, 1, 2,
+    1, 2, 3,
+
+    4, 5, 6,
+    5, 6, 7,
+
+    2, 3, 6,
+    3, 6, 7,
+
+    0, 1, 4,
+    1, 4, 5,
+
+    0, 2, 4,
+    2, 4, 6,
+
+    1, 3, 5,
+    3, 5, 7
+  };
+
+  model.indices_n = 3 * 12;
+  model.indices = malloc(sizeof(unsigned int) * model.indices_n);
+  memcpy(model.indices, indices, 3 * 12 * sizeof(unsigned int));
+
+  return model;
+}
+
 
 Shape generateQuad() {
   Shape q;

@@ -220,7 +220,8 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   renderer->camera.target = vec3(0.0, 0.0, 0.0);
   renderer->camera.up = vec3(0.0, 1.0, 0.0);
 
-  renderer->model = generateIcoSphere(1.0, 1);
+  //renderer->model = generateIcoSphere(1.0, 1);
+  renderer->model = generateCube(1.0);
   loadModel(&renderer->model);
 
   renderer->quad2D = generateQuad();
@@ -282,7 +283,7 @@ void render(RenderInfo *renderer) {
 
   renderer->model.position = vec3(0.0, 2.0 * sin(step), 0.0);
   renderer->model.eulerRotation = vec3(step, 0.5 * step, 2.0 * step);
-  step += 0.01;
+  //step += 0.01;
   Matrix4x4F model = matrix4x4toMatrix4x4F(modelMatrix(&renderer->model));
   unsigned int modelL = glGetUniformLocation(renderer->shader3D, "model");
   glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
