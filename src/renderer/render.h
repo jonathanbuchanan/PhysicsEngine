@@ -158,6 +158,12 @@ typedef struct InputInfo {
   int callbacks_n;
 } InputInfo;
 
+typedef struct Camera {
+  Vector3 position;
+  Vector3 target;
+  Vector3 up;
+} Camera;
+
 typedef GLuint ShaderProgram;
 typedef struct RenderInfo {
   GLFWwindow *window;
@@ -170,6 +176,8 @@ typedef struct RenderInfo {
   ShaderProgram shader3D;
   ShaderProgram shader2D;
   ShaderProgram shader2DTextured;
+
+  Camera camera;
 
   Model model;
 

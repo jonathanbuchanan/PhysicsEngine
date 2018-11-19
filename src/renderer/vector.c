@@ -215,6 +215,39 @@ Matrix4x4 orthographicProjectionMatrix(double zNear, double zFar, double left, d
   return result;
 }
 
+Matrix4x4 lookAt(Vector3 eye, Vector3 center, Vector3 up) {
+  Vector3 f = subtractVector3(center, eye);
+  double f_length = magnitudeVector3(f);
+  Vector3 f_norm = vec3(f.x / f_length, f.y / f_length, f.z / f_length);
+
+  double up_length = magnitudeVector3(up);
+  Vector3 up_norm = vec3(up.x / up_length, up.y / up_length, up.z / up_length);
+
+  Vector3 s = crossProduct(f_norm, up_norm);
+  double s_length = magnitudeVector3(s);
+  Vector3 s_norm = vec3(s.x / s_length, s.y / s_length, s.z / s_length);
+
+  Vector3 u = crossProduct(s_norm, f_norm);
+
+  Matrix4x4 result = {0};
+
+  result.a11 = s.x;
+  result.a12 = s.y;
+  result.a13 = s.z;
+
+  result.a21 = u.x;
+  result.a22 = u.y;
+  result.a23 = u.z;
+
+  result.a31 = -f_norm.x;
+  result.a32 = -f_norm.y;
+  result.a33 = -f_norm.z;
+
+  result.a44 = 1;
+
+  return result;
+}
+
 Matrix4x4F matrix4x4toMatrix4x4F(Matrix4x4 m) {
   Matrix4x4F result;
   float *outArray = &result.a11;

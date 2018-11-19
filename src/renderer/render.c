@@ -279,7 +279,7 @@ void render(RenderInfo *renderer) {
   unsigned int modelL = glGetUniformLocation(renderer->shader3D, "model");
   glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
 
-  Matrix4x4F view = matrix4x4toMatrix4x4F(translationMatrix(vec3(0.0, 0.0, -2.0)));
+  Matrix4x4F view = matrix4x4toMatrix4x4F(lookAt(renderer->camera.position, renderer->camera.target, renderer->camera.up));
   unsigned int viewL = glGetUniformLocation(renderer->shader3D, "view");
   glUniformMatrix4fv(viewL, 1, GL_TRUE, (GLfloat *)&view.a11);
 
