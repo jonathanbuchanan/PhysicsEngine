@@ -9,6 +9,7 @@
 
 #include "model.h"
 #include "menu.h"
+#include "camera.h"
 
 #define GLYPH_COUNT 128
 
@@ -158,12 +159,6 @@ typedef struct InputInfo {
   int callbacks_n;
 } InputInfo;
 
-typedef struct Camera {
-  Vector3 position;
-  Vector3 target;
-  Vector3 up;
-} Camera;
-
 typedef GLuint ShaderProgram;
 typedef struct RenderInfo {
   GLFWwindow *window;
@@ -188,6 +183,7 @@ typedef struct RenderInfo {
 } RenderInfo;
 
 RenderInfo * createRenderer(GLFWwindow *window);
+Camera * getCamera(RenderInfo *renderer);
 void freeRenderer(RenderInfo *renderer);
 void render(RenderInfo *renderer);
 void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color, double z);

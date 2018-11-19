@@ -245,7 +245,9 @@ Matrix4x4 lookAt(Vector3 eye, Vector3 center, Vector3 up) {
 
   result.a44 = 1;
 
-  return result;
+  Matrix4x4 trans = translationMatrix(vec3(-eye.x, -eye.y, -eye.z));
+
+  return multiplyMatrix4x4(result, trans);
 }
 
 Matrix4x4F matrix4x4toMatrix4x4F(Matrix4x4 m) {

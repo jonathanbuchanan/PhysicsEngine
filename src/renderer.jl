@@ -1,6 +1,7 @@
 module Renderer
 
 import ..@fullLibraryPath
+import ..Vector3
 
 # Bindings
 
@@ -26,10 +27,6 @@ end
 function terminate(renderer::RenderInfo)
   ccall((:terminate, @fullLibraryPath), Cvoid, (RenderInfo,), renderer)
 end
-
-#mutable struct Camera
-#  position::Vector3
-#end
 
 function createRenderer(window::Window)
   ccall((:createRenderer, @fullLibraryPath), RenderInfo, (Window,), window)
@@ -185,5 +182,34 @@ end
   Repeat = 2
 end
 
+const Camera = Ptr{Cvoid}
+
+function getCamera(renderer::RenderInfo)
+  return ccall((:getCamera, @fullLibraryPath), Camera, (RenderInfo,), renderer)
+end
+
+function cameraGetPosition(camera::Camera)
+  return ccall((:cameraGetPosition, @fullLibraryPath), Vector3, (Camera,), camera)
+end
+
+function cameraGetTarget(camera::Camera)
+  return ccall((:cameraGetTarget, @fullLibraryPath), Vector3, (Camera,), camera)
+end
+
+function cameraGetUp(camera::Camera)
+  return ccall((:cameraGetUp, @fullLibraryPath), Vector3, (Camera,), camera)
+end
+
+function cameraSetPosition(camera::Camera, position::Vector3)
+  return ccall((:cameraSetPosition, @fullLibraryPath), Cvoid, (Camera, Vector3), camera, position)
+end
+
+function cameraSetTarget(camera::Camera, target::Vector3)
+  return ccall((:cameraSetTarget, @fullLibraryPath), Cvoid, (Camera, Vector3), camera, target)
+end
+
+function cameraSetUp(camera::Camera, up::Vector3)
+  return ccall((:cameraSetUp, @fullLibraryPath), Cvoid, (Camera, Vector3), camera, up)
+end
 
 end
