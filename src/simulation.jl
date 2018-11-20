@@ -13,6 +13,8 @@ function simulate()
   renderer = Renderer.createRenderer(window)
   camera = Renderer.getCamera(renderer)
 
+  registerControls(renderer, camera)
+
   function esc_callback(key)
     Renderer.closeWindow(window)
   end
@@ -22,7 +24,7 @@ function simulate()
   step = 0
   while Renderer.windowCloseStatus(window) != true
     Renderer.render(renderer)
-    Renderer.cameraSetPosition(camera, vec3(10 * sin(step), 0.0, 10 * cos(step)))
+    Renderer.cameraSetUp(camera, vec3(10 * sin(step), 10 * cos(step), 0.0))
     step += 0.01
   end
 
