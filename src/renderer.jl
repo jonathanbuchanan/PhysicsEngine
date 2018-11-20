@@ -49,7 +49,7 @@ function setClearColor(window::Window, red::Float64, green::Float64, blue::Float
 end
 
 function addKeyCallback(renderer::RenderInfo, callback, key, action)
-  ccall((:addKeyCallback, @fullLibraryPath), Cvoid, (RenderInfo, Cint, Cint, Ptr{Cvoid}), renderer, key, action, @cfunction($callback, Cvoid, (Cint,)))
+  ccall((:addKeyCallback, @fullLibraryPath), Cvoid, (RenderInfo, Cint, Cint, Ptr{Cvoid}), renderer, key, action, @cfunction($callback, Cvoid, (RenderInfo, Cint)))
 end
 
 @enum Key begin

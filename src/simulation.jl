@@ -15,7 +15,7 @@ function simulate()
 
   registerControls(renderer, camera)
 
-  function esc_callback(key)
+  function esc_callback(renderer, key)
     Renderer.closeWindow(window)
   end
 
@@ -24,8 +24,8 @@ function simulate()
   step = 0
   while Renderer.windowCloseStatus(window) != true
     Renderer.render(renderer)
-    Renderer.cameraSetUp(camera, vec3(10 * sin(step), 10 * cos(step), 0.0))
-    step += 0.01
+    #Renderer.cameraSetUp(camera, vec3(10 * sin(step), 10 * cos(step), 0.0))
+    #step += 0.01
   end
 
   Renderer.terminate(renderer)

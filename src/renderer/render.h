@@ -150,7 +150,9 @@ typedef enum KeyAction {
   Repeat = 2
 } KeyAction;
 
-typedef void(* KeyCallbackFunction)(int);
+typedef struct RenderInfo RenderInfo;
+
+typedef void(* KeyCallbackFunction)(RenderInfo *, int);
 typedef struct InputInfo {
   Key *chars;
   KeyAction *actions;

@@ -157,7 +157,7 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
   RenderInfo *renderer = (RenderInfo *)glfwGetWindowUserPointer(window);
   for (int i = 0; i < renderer->input.callbacks_n; ++i) {
     if (key == renderer->input.chars[i] && action == renderer->input.actions[i]) {
-      renderer->input.callbacks[i](key);
+      renderer->input.callbacks[i](renderer, key);
     }
   }
 }
