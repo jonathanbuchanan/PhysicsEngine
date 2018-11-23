@@ -62,6 +62,43 @@ function d_pressed(renderer, key)
   return
 end
 
+function space_pressed(renderer, key)
+  camera = Renderer.getCamera(renderer)
+  up = Renderer.cameraGetUp(camera)
+  up_norm = vec3(up.x * (0.1 / magnitude(up)),
+    up.y * (0.1 / magnitude(up)),
+    up.z * (0.1 / magnitude(up)))
+  Renderer.cameraSetPosition(camera, Renderer.cameraGetPosition(camera) + up_norm)
+  Renderer.cameraSetTarget(camera, Renderer.cameraGetTarget(camera) + up_norm)
+end
+
+function rshift_pressed(renderer, key)
+  camera = Renderer.getCamera(renderer)
+  up = Renderer.cameraGetUp(camera)
+  up_norm = vec3(up.x * (-0.1 / magnitude(up)),
+    up.y * (-0.1 / magnitude(up)),
+    up.z * (-0.1 / magnitude(up)))
+  up_norm = vec3(0.0, -0.1, 0.0)
+  Renderer.cameraSetPosition(camera, Renderer.cameraGetPosition(camera) + up_norm)
+  Renderer.cameraSetTarget(camera, Renderer.cameraGetTarget(camera) + up_norm)
+end
+
+theta = 0.0
+
+function leftarrow_pressed(renderer, key)
+  camera = Renderer.getCamera(renderer)
+  global theta = theta + 0.02
+  new_direction = vec3(sin(theta), 0.0, cos(theta))
+  Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
+end
+
+function rightarrow_pressed(renderer, key)
+  camera = Renderer.getCamera(renderer)
+  global theta = theta - 0.02
+  new_direction = vec3(sin(theta), 0.0, cos(theta))
+  Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
+end
+
 function registerControls(renderer, camera)
   Renderer.addKeyCallback(renderer, w_pressed, Renderer.KeyW, Renderer.Press)
   Renderer.addKeyCallback(renderer, w_pressed, Renderer.KeyW, Renderer.Repeat)
@@ -74,4 +111,16 @@ function registerControls(renderer, camera)
 
   Renderer.addKeyCallback(renderer, d_pressed, Renderer.KeyD, Renderer.Press)
   Renderer.addKeyCallback(renderer, d_pressed, Renderer.KeyD, Renderer.Repeat)
+
+  Renderer.addKeyCallback(renderer, space_pressed, Renderer.Space, Renderer.Press)
+  Renderer.addKeyCallback(renderer, space_pressed, Renderer.Space, Renderer.Repeat)
+
+  Renderer.addKeyCallback(renderer, rshift_pressed, Renderer.RightShift, Renderer.Press)
+  Renderer.addKeyCallback(renderer, rshift_pressed, Renderer.RightShift, Renderer.Repeat)
+
+  Renderer.addKeyCallback(renderer, leftarrow_pressed, Renderer.KeyLeft, Renderer.Press)
+  Renderer.addKeyCallback(renderer, leftarrow_pressed, Renderer.KeyLeft, Renderer.Repeat)
+
+  Renderer.addKeyCallback(renderer, rightarrow_pressed, Renderer.KeyRight, Renderer.Press)
+  Renderer.addKeyCallback(renderer, rightarrow_pressed, Renderer.KeyRight, Renderer.Repeat)
 end
