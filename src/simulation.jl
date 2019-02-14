@@ -1,3 +1,11 @@
+function setupSimulation(simulation)
+  electron = Electron(vec3(0.0, 5.0, 5.0), vec3(0.0, 0.0, 0.0))
+  proton = Electron(vec3(0.0, -5.0, 5.0), vec3(0.0, 0.0, 0.0))
+
+  addParticle!(simulation, electron)
+  addParticle!(simulation, proton)
+end
+
 # Main simulation loop
 function simulate()
   # Create the simulation
@@ -21,14 +29,27 @@ function simulate()
 
   Renderer.addKeyCallback(renderer, esc_callback, Renderer.Escape, Renderer.Press)
 
+
+
+
+  setupSimulation(simulation)
+
   step = 0
   while Renderer.windowCloseStatus(window) != true
     Renderer.render(renderer)
     #Renderer.cameraSetUp(camera, vec3(10 * sin(step), 10 * cos(step), 0.0))
     #step += 0.01
+
+    simulationStep!(simulation)
   end
 
   Renderer.terminate(renderer)
+end
+
+# Contains a particle and the necessary rendering handle
+mutable struct ParticleContainer
+  particle::Particle
+  renderObject::Ptr{Cvoid}
 end
 
 # Simulation object

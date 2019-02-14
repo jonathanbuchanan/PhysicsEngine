@@ -107,7 +107,7 @@ ShaderProgram compileShader(const char *vertex_shader_source, const char *fragme
 }
 
 int loadFont(RenderInfo *renderer) {
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);  
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
   int error = FT_Init_FreeType(&renderer->fontLibrary);
   if (error)
@@ -153,12 +153,18 @@ void test_callback(Button *b) {
   printf("press\n");
 }
 
-void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-  RenderInfo *renderer = (RenderInfo *)glfwGetWindowUserPointer(window);
+void checkKeys(RenderInfo *renderer) {
   for (int i = 0; i < renderer->input.callbacks_n; ++i) {
-    if (key == renderer->input.chars[i] && action == renderer->input.actions[i]) {
-      renderer->input.callbacks[i](renderer, key);
-    }
+    int key = renderer->input.chars[i];
+    int action = renderer->input.actions[i];
+    int previousState = renderer->input.keystates[key];
+    int state = glfwGetKey(renderer->window, key);
+    if (previousState == 0 && state == 1 && action == Press) renderer->input.callbacks[i](renderer, key);
+    if (previousState == 1 && state == 0 && action == Release) renderer->input.callbacks[i](renderer, key);
+    if (previousState == 1 && state == 1 && action == Repeat) renderer->input.callbacks[i](renderer, key);
+  }
+  for (int i = LOWEST_KEY; i < HIGHEST_KEY; ++i) {
+    renderer->input.keystates[i] = glfwGetKey(renderer->window, i);
   }
 }
 
@@ -172,7 +178,6 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
 
   glfwSetWindowSizeCallback(window, windowResizeCallback);
-  glfwSetKeyCallback(window, keyCallback);
 
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
 
@@ -189,7 +194,7 @@ RenderInfo * createRenderer(GLFWwindow *window) {
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
   GLuint vao;
@@ -269,6 +274,8 @@ void render(RenderInfo *renderer) {
   GLFWwindow *window = renderer->window;
 
   glfwMakeContextCurrent(window);
+
+  checkKeys(renderer);
 
   // Set the viewport
   int height, width;
@@ -430,4 +437,3 @@ void addKeyCallback(RenderInfo *renderer, Key key, KeyAction action, KeyCallback
   renderer->input.actions[renderer->input.callbacks_n - 1] = action;
   renderer->input.callbacks[renderer->input.callbacks_n - 1] = callback;
 }
-

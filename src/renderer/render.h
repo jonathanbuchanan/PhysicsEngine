@@ -152,6 +152,9 @@ typedef enum KeyAction {
 
 typedef struct RenderInfo RenderInfo;
 
+#define LOWEST_KEY 32
+#define HIGHEST_KEY 348
+
 typedef void(* KeyCallbackFunction)(RenderInfo *, int);
 typedef struct InputInfo {
   Key *chars;
@@ -159,6 +162,8 @@ typedef struct InputInfo {
   KeyCallbackFunction *callbacks;
 
   int callbacks_n;
+
+  int keystates[HIGHEST_KEY];
 } InputInfo;
 
 typedef GLuint ShaderProgram;

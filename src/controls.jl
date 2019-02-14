@@ -78,7 +78,6 @@ function rshift_pressed(renderer, key)
   up_norm = vec3(up.x * (-0.1 / magnitude(up)),
     up.y * (-0.1 / magnitude(up)),
     up.z * (-0.1 / magnitude(up)))
-  up_norm = vec3(0.0, -0.1, 0.0)
   Renderer.cameraSetPosition(camera, Renderer.cameraGetPosition(camera) + up_norm)
   Renderer.cameraSetTarget(camera, Renderer.cameraGetTarget(camera) + up_norm)
 end
@@ -112,11 +111,11 @@ function registerControls(renderer, camera)
   Renderer.addKeyCallback(renderer, d_pressed, Renderer.KeyD, Renderer.Press)
   Renderer.addKeyCallback(renderer, d_pressed, Renderer.KeyD, Renderer.Repeat)
 
-  Renderer.addKeyCallback(renderer, space_pressed, Renderer.Space, Renderer.Press)
-  Renderer.addKeyCallback(renderer, space_pressed, Renderer.Space, Renderer.Repeat)
-
   Renderer.addKeyCallback(renderer, rshift_pressed, Renderer.RightShift, Renderer.Press)
   Renderer.addKeyCallback(renderer, rshift_pressed, Renderer.RightShift, Renderer.Repeat)
+
+  Renderer.addKeyCallback(renderer, space_pressed, Renderer.Space, Renderer.Press)
+  Renderer.addKeyCallback(renderer, space_pressed, Renderer.Space, Renderer.Repeat)
 
   Renderer.addKeyCallback(renderer, leftarrow_pressed, Renderer.KeyLeft, Renderer.Press)
   Renderer.addKeyCallback(renderer, leftarrow_pressed, Renderer.KeyLeft, Renderer.Repeat)

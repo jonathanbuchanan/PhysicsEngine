@@ -1,18 +1,18 @@
 abstract type Particle end
 
 mutable struct Electron <: Particle
-  position::Vector
-  velocity::Vector
+  position::Vector3
+  velocity::Vector3
 end
 
 mutable struct Proton <: Particle
-  position::Vector
-  velocity::Vector
+  position::Vector3
+  velocity::Vector3
 end
 
 mutable struct Neutron <: Particle
-  position::Vector
-  velocity::Vector
+  position::Vector3
+  velocity::Vector3
 end
 
 # Properties of particles
