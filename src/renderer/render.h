@@ -181,7 +181,7 @@ typedef struct RenderInfo {
 
   Camera camera;
 
-  Model model;
+  Model sphere;
 
   Shape quad2D; // The quad used for 2D rendering
   Menu menu;
@@ -192,7 +192,11 @@ typedef struct RenderInfo {
 RenderInfo * createRenderer(GLFWwindow *window);
 Camera * getCamera(RenderInfo *renderer);
 void freeRenderer(RenderInfo *renderer);
-void render(RenderInfo *renderer);
+
+void beginRender(RenderInfo *renderer);
+void endRender(RenderInfo *renderer);
+
+void renderSphere(RenderInfo *renderer, float radius, Vector3 color, Vector3 position);
 void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color, double z);
 void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector4 color, double z);
 

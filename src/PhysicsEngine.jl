@@ -7,8 +7,8 @@ macro fullLibraryPath()
 end
 
 include("vector.jl")
-include("renderer.jl")
 include("particle.jl")
+include("renderer.jl")
 include("controls.jl")
 include("simulation.jl")
 include("grid.jl")

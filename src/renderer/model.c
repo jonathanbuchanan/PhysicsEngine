@@ -50,8 +50,9 @@ Matrix4x4 modelMatrix(Model *model) {
   Matrix4x4 rotX = rotationXMatrix(model->eulerRotation.x);
   Matrix4x4 rotY = rotationYMatrix(model->eulerRotation.y);
   Matrix4x4 rotZ = rotationZMatrix(model->eulerRotation.z);
+  Matrix4x4 scale = scalingMatrix(vec3(model->scale.x, model->scale.y, model->scale.z));
 
-  return MATMUL(MATMUL(MATMUL(translation, rotX), rotY), rotZ);
+  return MATMUL(MATMUL(MATMUL(MATMUL(translation, rotX), rotY), rotZ), scale);
 }
 
 
@@ -367,7 +368,7 @@ int drawShape(Shape *s) {
   glBindVertexArray(s->mesh.vao);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
- 
+
 
   return 0;
 }

@@ -1,9 +1,11 @@
 function setupSimulation(simulation)
-  electron = Electron(vec3(0.0, 5.0, 5.0), vec3(0.0, 0.0, 0.0))
-  proton = Electron(vec3(0.0, -5.0, 5.0), vec3(0.0, 0.0, 0.0))
+  electron = Electron(vec3(1.0, 5.0, 5.0), vec3(0.0, 0.0, 0.0))
+  proton = Proton(vec3(-1.0, -5.0, 5.0), vec3(0.0, 0.0, 0.0))
+  neutron = Neutron(vec3(0.0, 0.0, 5.0), vec3(0.0, 0.0, 0.0))
 
   addParticle!(simulation, electron)
   addParticle!(simulation, proton)
+  addParticle!(simulation, neutron)
 end
 
 # Main simulation loop
@@ -36,7 +38,7 @@ function simulate()
 
   step = 0
   while Renderer.windowCloseStatus(window) != true
-    Renderer.render(renderer)
+    Renderer.render(renderer, simulation)
     #Renderer.cameraSetUp(camera, vec3(10 * sin(step), 10 * cos(step), 0.0))
     #step += 0.01
 

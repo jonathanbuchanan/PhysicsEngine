@@ -11,18 +11,16 @@ static const char *vertex_shader_3D =
 "uniform mat4 model;\n"
 "uniform mat4 view;\n"
 "uniform mat4 projection;\n"
-"out vec3 color;\n"
 "void main() {\n"
 "    gl_Position = projection * view * model * vec4(pos, 1.0);\n"
-"    color = pos;\n"
 "}\n";
 
 static const char *fragment_shader_3D =
 "#version 330 core\n"
-"in vec3 color;\n"
+"uniform vec3 color;\n"
 "out vec4 FragColor;\n"
 "void main() {\n"
-"    FragColor = vec4((color / 2) + vec3(0.5, 0.5, 0.5), 1.0);\n"
+"    FragColor = vec4(color, 1.0);\n"
 "}\n";
 
 
@@ -225,9 +223,8 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   renderer->camera.target = vec3(0.0, 0.0, 0.0);
   renderer->camera.up = vec3(0.0, 1.0, 0.0);
 
-  //renderer->model = generateIcoSphere(1.0, 1);
-  renderer->model = generateCube(1.0);
-  loadModel(&renderer->model);
+  renderer->sphere = generateIcoSphere(1.0, 2);
+  loadModel(&renderer->sphere);
 
   renderer->quad2D = generateQuad();
   loadShape(&renderer->quad2D);
@@ -262,15 +259,14 @@ Camera * getCamera(RenderInfo *renderer) {
 }
 
 void freeRenderer(RenderInfo *renderer) {
-  freeModel(&renderer->model);
+  freeModel(&renderer->sphere);
   freeShape(&renderer->quad2D);
 
   FT_Done_Face(renderer->fontFace);
   FT_Done_FreeType(renderer->fontLibrary);
 }
 
-double step = 0.0;
-void render(RenderInfo *renderer) {
+void beginRender(RenderInfo *renderer) {
   GLFWwindow *window = renderer->window;
 
   glfwMakeContextCurrent(window);
@@ -284,14 +280,32 @@ void render(RenderInfo *renderer) {
 
   // Clear
   clear(window);
+}
 
+void endRender(RenderInfo *renderer) {
+  GLFWwindow *window = renderer->window;
+
+  // Swap the buffers
+  glUseProgram(renderer->shader2D);
+  updateMenu(&renderer->menu, renderer);
+  drawMenu(&renderer->menu, renderer);
+
+  swapBuffers(window);
+  glfwPollEvents();
+}
+
+void renderSphere(RenderInfo *renderer, float radius, Vector3 color, Vector3 position) {
   // Draw
   glUseProgram(renderer->shader3D);
 
-  renderer->model.position = vec3(0.0, 2.0 * sin(step), 0.0);
-  renderer->model.eulerRotation = vec3(step, 0.5 * step, 2.0 * step);
-  //step += 0.01;
-  Matrix4x4F model = matrix4x4toMatrix4x4F(modelMatrix(&renderer->model));
+  int height, width;
+  glfwGetFramebufferSize(renderer->window, &width, &height);
+  glViewport(0, 0, width, height);
+
+  renderer->sphere.position = position;
+  renderer->sphere.scale = vec3(radius, radius, radius);
+
+  Matrix4x4F model = matrix4x4toMatrix4x4F(modelMatrix(&renderer->sphere));
   unsigned int modelL = glGetUniformLocation(renderer->shader3D, "model");
   glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
 
@@ -303,20 +317,10 @@ void render(RenderInfo *renderer) {
   unsigned int projectionL = glGetUniformLocation(renderer->shader3D, "projection");
   glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
 
-  drawModel(&renderer->model);
+  unsigned int colorL = glGetUniformLocation(renderer->shader3D, "color");
+  glUniform3f(colorL, color.x, color.y, color.z);
 
-
-
-  ((Button *)button.control)->color = vec4(fabs(sin(step * 0.4)), fabs(cos(step * 0.2)), fabs(sin(step * 0.55)), 1.0);
-
-  glUseProgram(renderer->shader2D);
-
-  updateMenu(&renderer->menu, renderer);
-  drawMenu(&renderer->menu, renderer);
-
-  // Swap the buffers
-  swapBuffers(window);
-  glfwPollEvents();
+  drawModel(&renderer->sphere);
 }
 
 void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color, double z) {

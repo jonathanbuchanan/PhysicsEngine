@@ -22,6 +22,7 @@ typedef struct Model {
 
   Vector3 position;
   Vector3 eulerRotation;
+  Vector3 scale;
 } Model;
 
 // Loads the model data into OpenGL buffers
