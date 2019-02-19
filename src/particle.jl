@@ -48,14 +48,14 @@ end
 
 
 # Mass (kg)
-function mass(::Electron)
-  return 9.109e-31
+function particleMass(::Electron)
+  return 1
 end
 
-function mass(::Proton)
-  return 1.673e-27
+function particleMass(::Proton)
+  return 10
 end
 
-function mass(::Neutron)
-  return 1.675e-27
+function particleMass(::Neutron)
+  return 10
 end

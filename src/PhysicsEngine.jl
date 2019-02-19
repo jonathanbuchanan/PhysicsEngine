@@ -8,6 +8,7 @@ end
 
 include("vector.jl")
 include("particle.jl")
+include("motion.jl")
 include("renderer.jl")
 include("controls.jl")
 include("simulation.jl")

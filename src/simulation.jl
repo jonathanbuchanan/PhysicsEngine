@@ -31,9 +31,6 @@ function simulate()
 
   Renderer.addKeyCallback(renderer, esc_callback, Renderer.Escape, Renderer.Press)
 
-
-
-
   setupSimulation(simulation)
 
   step = 0
@@ -69,6 +66,12 @@ end
 "Runs a single step of a simulation"
 function simulationStep!(simulation)
   simulation.time += 1
+  for particle in simulation.objects
+    force = vec3(0.0, 0.0003, 0.0)
+    acceleration = applyForce(particle, force, 1)
+    applyAcceleration(particle, acceleration, 1)
+    applyVelocity(particle, 1)
+  end
 end
 
 "Adds a particle to a simulation"
