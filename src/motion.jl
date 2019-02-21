@@ -1,4 +1,22 @@
 # Coulomb's Law
+# F = k * ((q1 * q2) / r²)
+function coulombs(particle1, particle2)
+  k = 0.0003
+  force = k * ((charge(particle1) * charge(particle2)) / max(magnitude(particle1.position - particle2.position), 0.0001))
+  q = (charge(particle1) * charge(particle2))
+  ma = max(magnitude(particle1.position - particle2.position), 0.0001)
+  positive = vec3(
+    force * (particle1.position.x - particle2.position.x),
+    force * (particle1.position.y - particle2.position.y),
+    force * (particle1.position.z - particle2.position.z)
+  )
+  negative = vec3(
+    -force * (particle1.position.x - particle2.position.x),
+    -force * (particle1.position.y - particle2.position.y),
+    -force * (particle1.position.z - particle2.position.z)
+  )
+  return (positive, negative)
+end
 
 ## Velocity
 # Δx = v.x * Δt

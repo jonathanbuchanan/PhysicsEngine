@@ -1,5 +1,5 @@
 function setupSimulation(simulation)
-  electron = Electron(vec3(1.0, 5.0, 5.0), vec3(0.0, 0.0, 0.0))
+  electron = Electron(vec3(1.0, 5.0, 5.0), vec3(0.008, 0.0, 0.0))
   proton = Proton(vec3(-1.0, -5.0, 5.0), vec3(0.0, 0.0, 0.0))
   neutron = Neutron(vec3(0.0, 0.0, 5.0), vec3(0.0, 0.0, 0.0))
 
@@ -39,7 +39,10 @@ function simulate()
     #Renderer.cameraSetUp(camera, vec3(10 * sin(step), 10 * cos(step), 0.0))
     #step += 0.01
 
-    simulationStep!(simulation)
+    stepsperframe = 10
+    for i = 1:stepsperframe
+      simulationStep!(simulation)
+    end
   end
 
   Renderer.terminate(renderer)
@@ -66,9 +69,20 @@ end
 "Runs a single step of a simulation"
 function simulationStep!(simulation)
   simulation.time += 1
-  for particle in simulation.objects
-    force = vec3(0.0, 0.0003, 0.0)
-    acceleration = applyForce(particle, force, 1)
+  forces = Array{Vector3}(undef, length(simulation.objects))
+  for i in 1:length(simulation.objects)
+    forces[i] = vec3(0.0, 0.0, 0.0)
+  end
+  for i in 1:length(simulation.objects)
+    for j in (i + 1):length(simulation.objects)
+      (f1, f2) = coulombs(simulation.objects[i], simulation.objects[j])
+      forces[i] = forces[i] + f1
+      forces[j] = forces[j] + f2
+    end
+  end
+  for i in 1:length(simulation.objects)
+    particle = simulation.objects[i]
+    acceleration = applyForce(particle, forces[i], 1)
     applyAcceleration(particle, acceleration, 1)
     applyVelocity(particle, 1)
   end

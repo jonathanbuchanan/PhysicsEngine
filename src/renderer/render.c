@@ -229,7 +229,7 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   renderer->quad2D = generateQuad();
   loadShape(&renderer->quad2D);
 
-  renderer->menu = createMenu();
+  /*renderer->menu = createMenu();
   renderer->menu.position = vec2(0.0, 0.0);
   renderer->menu.size = vec2(100.0, 480.0);
   renderer->menu.color = vec4(0.8, 0.8, 0.8, 0.5);
@@ -249,7 +249,7 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   l->color = vec4(1.0, 1.0, 1.0, 1.0);
   l->text = "I am a label.";
   l->z_index = 1;
-  addControlToMenu(&renderer->menu, &label);
+  addControlToMenu(&renderer->menu, &label);*/
 
   return renderer;
 }

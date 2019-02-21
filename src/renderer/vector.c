@@ -107,7 +107,7 @@ double * accessMatrix4x4(Matrix4x4 *m, int row, int column) {
   else {
     // Error
     return NULL;
-  } 
+  }
 }
 
 Matrix4x4 multiplyMatrix4x4(Matrix4x4 a, Matrix4x4 b) {
