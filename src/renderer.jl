@@ -5,6 +5,8 @@ import ..Vector3
 
 import ..Electron, ..Proton, ..Neutron
 
+import ..Menu
+
 # Bindings
 
 const Window = Ptr{Cvoid}
@@ -13,7 +15,6 @@ const RenderInfo = Ptr{Cvoid}
 # Particle drawing
 function drawSphere(renderer, radius, color, position)
   ccall((:renderSphere, @fullLibraryPath), Cvoid, (RenderInfo, Cfloat, Vector3, Vector3), renderer, radius, color, position)
-  #ccall((:addKeyCallback, @fullLibraryPath), Cvoid, (RenderInfo, Cint, Cint, Ptr{Cvoid}), renderer, key, action, @cfunction($callback, Cvoid, (RenderInfo, Cint)))
 end
 
 function color(::Electron)
@@ -40,6 +41,10 @@ function drawParticle(renderer, particle::Neutron)
   drawSphere(renderer, 0.3, color(particle), particle.position)
 end
 
+function drawMenu(renderer, menu)
+  return ccall((:renderMenu, @fullLibraryPath), Cvoid, (RenderInfo, Menu), renderer, menu)
+end
+
 function init()
   return ccall((:init, @fullLibraryPath), Int32, ())
 end
@@ -64,13 +69,18 @@ function createRenderer(window::Window)
   ccall((:createRenderer, @fullLibraryPath), RenderInfo, (Window,), window)
 end
 
-function render(renderer::RenderInfo, simulation)
+function render(renderer::RenderInfo, simulation, menus)
   # Begin Render
   ccall((:beginRender, @fullLibraryPath), Cvoid, (RenderInfo,), renderer)
 
   # Iterate over particles
   for particle in simulation.objects
     drawParticle(renderer, particle)
+  end
+
+  # Iterate over menus
+  for menu in menus
+    drawMenu(renderer, menu)
   end
 
   # End Render

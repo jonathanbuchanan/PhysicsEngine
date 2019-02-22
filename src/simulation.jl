@@ -8,6 +8,43 @@ function setupSimulation(simulation)
   addParticle!(simulation, neutron)
 end
 
+function setupMenus()
+  menus = []
+
+  bottomMenu = createMenu()
+
+  setMenuOrientation(bottomMenu, Horizontal)
+  setMenuPosition(bottomMenu, vec2(0.0, 0.0))
+  setMenuSize(bottomMenu, vec2(640.0, 30.0))
+  setMenuColor(bottomMenu, vec4(0.3, 0.3, 0.3, 1.0))
+
+#renderer->menu = createMenu();
+#renderer->menu.position = vec2(0.0, 0.0);
+#renderer->menu.size = vec2(100.0, 480.0);
+#renderer->menu.color = vec4(0.8, 0.8, 0.8, 0.5);
+
+#button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
+#Button *b = getButton(&button);
+#b->highlight = vec4(1.0, 1.0, 1.0, 1.0);
+#b->select = vec4(1.0, 0.0, 1.0, 1.0);
+#b->action = test_callback;
+#b->text = "Button";
+#b->textColor = vec4(0.5, 0.5, 0.5, 1.0);
+#b->z_index = 1;
+#addControlToMenu(&renderer->menu, &button);
+
+#label = createLabel(vec2(100.0, 100.0), vec2(0.0, 100.0));
+#Label *l = getLabel(&label);
+#l->color = vec4(1.0, 1.0, 1.0, 1.0);
+#l->text = "I am a label.";
+#l->z_index = 1;
+#addControlToMenu(&renderer->menu, &label);
+
+  push!(menus, bottomMenu)
+
+  return menus
+end
+
 # Main simulation loop
 function simulate()
   # Create the simulation
@@ -31,11 +68,13 @@ function simulate()
 
   Renderer.addKeyCallback(renderer, esc_callback, Renderer.Escape, Renderer.Press)
 
+  menus = setupMenus()
+
   setupSimulation(simulation)
 
   step = 0
   while Renderer.windowCloseStatus(window) != true
-    Renderer.render(renderer, simulation)
+    Renderer.render(renderer, simulation, menus)
     #Renderer.cameraSetUp(camera, vec3(10 * sin(step), 10 * cos(step), 0.0))
     #step += 0.01
 

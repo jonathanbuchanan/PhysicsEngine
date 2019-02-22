@@ -5,6 +5,10 @@
 # Vector2
 const Vector2 = NamedTuple{(:x, :y), Tuple{Float64, Float64}}
 
+function vec2(x::Float64, y::Float64)
+  return Vector2((x, y))
+end
+
 function Base.:+(a::Vector2, b::Vector2)
   return ccall((:addVector2, @fullLibraryPath), Vector2, (Vector2, Vector2), a, b)
 end
@@ -50,6 +54,10 @@ end
 
 # Vector4
 const Vector4 = NamedTuple{(:x, :y, :z, :w), Tuple{Float64, Float64, Float64, Float64}}
+
+function vec4(x::Float64, y::Float64, z::Float64, w::Float64)
+  return Vector4((x, y, z, w))
+end
 
 function Base.:+(a::Vector4, b::Vector4)
   return ccall((:addVector4, @fullLibraryPath), Vector4, (Vector4, Vector4), a, b)

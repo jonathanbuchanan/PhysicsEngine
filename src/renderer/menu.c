@@ -12,16 +12,39 @@ int updateControl(Control *control, RenderInfo *renderer) {
 }
 
 
+Menu * createMenu() {
+  Menu *menu = malloc(sizeof(Menu));
 
-Menu createMenu() {
-  Menu m = (Menu){};
-  return m;
+  menu->orientation = Vertical;
+  menu->position = vec2(0.0, 0.0);
+  menu->size = vec2(0.0, 0.0);
+  menu->color = vec4(0.0, 0.0, 0.0, 0.0);
+  menu->z_index = 0;
+  menu->controls_n = 0;
+
+  return menu;
 }
 
 void addControlToMenu(Menu *menu, Control *control) {
   menu->controls = realloc(menu->controls, sizeof(Control *) * menu->controls_n);
   menu->controls[menu->controls_n] = control;
   ++menu->controls_n;
+}
+
+void setMenuOrientation(Menu *menu, MenuOrientation orientation) {
+  menu->orientation = orientation;
+}
+
+void setMenuPosition(Menu *menu, Vector2 position) {
+  menu->position = position;
+}
+
+void setMenuSize(Menu *menu, Vector2 size) {
+  menu->size = size;
+}
+
+void setMenuColor(Menu *menu, Vector4 color) {
+  menu->color = color;
 }
 
 int drawMenu(Menu *menu, RenderInfo *renderer) {
@@ -43,14 +66,17 @@ int updateMenu(Menu *menu, RenderInfo *renderer) {
 
 
 
-Control createButton(Vector2 size, Vector2 position) {
+Control * createButton(Vector2 size, Vector2 position) {
   Button *b = malloc(sizeof(Button));
 
   b->state = Normal;
   b->size = size;
   b->position = position;
 
-  Control c = {b, drawButton, updateButton};
+  Control *c = malloc(sizeof(Control));
+  c->control = b;
+  c->draw = drawButton;
+  c->update = updateButton;
 
   return c;
 }
@@ -64,8 +90,8 @@ int drawButton(void *c, RenderInfo *renderer, Vector2 offset) {
   else if (button->state == Highlighted)
     color = button->highlight;
   else if (button->state == Selected)
-    color = button->select; 
-  
+    color = button->select;
+
   renderQuad(renderer, button->size, addVector2(button->position, offset), color, (float)button->z_index / (float)Z_INDEX_MAX);
   renderText(renderer, button->text, addVector2(button->position, offset), button->textColor, (float)(button->z_index + 1) / (float)Z_INDEX_MAX);
 
@@ -101,13 +127,16 @@ Button * getButton(Control *button) {
 
 
 
-Control createLabel(Vector2 size, Vector2 position) {
+Control * createLabel(Vector2 size, Vector2 position) {
   Label *l = malloc(sizeof(Label));
 
   l->size = size;
   l->position = position;
 
-  Control c = {l, drawLabel, updateLabel};
+  Control *c = malloc(sizeof(Control));
+  c->control = l;
+  c->draw = drawLabel;
+  c->update = updateLabel;
 
   return c;
 }

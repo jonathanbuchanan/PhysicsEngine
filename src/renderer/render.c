@@ -147,10 +147,6 @@ int loadFont(RenderInfo *renderer) {
   return 0;
 }
 
-void test_callback(Button *b) {
-  printf("press\n");
-}
-
 void checkKeys(RenderInfo *renderer) {
   for (int i = 0; i < renderer->input.callbacks_n; ++i) {
     int key = renderer->input.chars[i];
@@ -229,28 +225,6 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   renderer->quad2D = generateQuad();
   loadShape(&renderer->quad2D);
 
-  /*renderer->menu = createMenu();
-  renderer->menu.position = vec2(0.0, 0.0);
-  renderer->menu.size = vec2(100.0, 480.0);
-  renderer->menu.color = vec4(0.8, 0.8, 0.8, 0.5);
-
-  button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
-  Button *b = getButton(&button);
-  b->highlight = vec4(1.0, 1.0, 1.0, 1.0);
-  b->select = vec4(1.0, 0.0, 1.0, 1.0);
-  b->action = test_callback;
-  b->text = "Button";
-  b->textColor = vec4(0.5, 0.5, 0.5, 1.0);
-  b->z_index = 1;
-  addControlToMenu(&renderer->menu, &button);
-
-  label = createLabel(vec2(100.0, 100.0), vec2(0.0, 100.0));
-  Label *l = getLabel(&label);
-  l->color = vec4(1.0, 1.0, 1.0, 1.0);
-  l->text = "I am a label.";
-  l->z_index = 1;
-  addControlToMenu(&renderer->menu, &label);*/
-
   return renderer;
 }
 
@@ -284,11 +258,6 @@ void beginRender(RenderInfo *renderer) {
 
 void endRender(RenderInfo *renderer) {
   GLFWwindow *window = renderer->window;
-
-  // Swap the buffers
-  glUseProgram(renderer->shader2D);
-  updateMenu(&renderer->menu, renderer);
-  drawMenu(&renderer->menu, renderer);
 
   swapBuffers(window);
   glfwPollEvents();
@@ -392,6 +361,10 @@ void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector
 
     pos.x += renderer->glyphs[c].advance / 64;
   }
+}
+
+void renderMenu(RenderInfo *renderer, Menu *menu) {
+  drawMenu(menu, renderer);
 }
 
 Vector2 getWindowSize(const RenderInfo *renderer) {
