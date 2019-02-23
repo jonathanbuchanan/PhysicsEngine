@@ -70,7 +70,7 @@ typedef struct Button {
   void (* action)(struct Button *sender);
 } Button;
 
-Control * createButton(Vector2 size, Vector2 position);
+Control * createButton();
 int drawButton(void *c, RenderInfo *renderer, Vector2 offset);
 int updateButton(void *c, RenderInfo *renderer);
 Button * getButton(Control *button);
@@ -85,9 +85,14 @@ typedef struct Label {
   const char *text;
 } Label;
 
-Control * createLabel(Vector2 size, Vector2 position);
+Control * createLabel();
 int drawLabel(void *c, RenderInfo *renderer, Vector2 offset);
 int updateLabel(void *c, RenderInfo *renderer);
 Label * getLabel(Control *label);
+void setLabelZ(Control *label, unsigned int z);
+void setLabelPosition(Control *label, Vector2 position);
+void setLabelSize(Control *label, Vector2 size);
+void setLabelColor(Control *label, Vector4 color);
+void setLabelText(Control *label, char * text);
 
 #endif

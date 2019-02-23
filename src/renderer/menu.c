@@ -26,7 +26,7 @@ Menu * createMenu() {
 }
 
 void addControlToMenu(Menu *menu, Control *control) {
-  menu->controls = realloc(menu->controls, sizeof(Control *) * menu->controls_n);
+  menu->controls = realloc(menu->controls, sizeof(Control *) * (menu->controls_n + 0));
   menu->controls[menu->controls_n] = control;
   ++menu->controls_n;
 }
@@ -66,12 +66,10 @@ int updateMenu(Menu *menu, RenderInfo *renderer) {
 
 
 
-Control * createButton(Vector2 size, Vector2 position) {
+Control * createButton() {
   Button *b = malloc(sizeof(Button));
 
   b->state = Normal;
-  b->size = size;
-  b->position = position;
 
   Control *c = malloc(sizeof(Control));
   c->control = b;
@@ -127,11 +125,8 @@ Button * getButton(Control *button) {
 
 
 
-Control * createLabel(Vector2 size, Vector2 position) {
+Control * createLabel() {
   Label *l = malloc(sizeof(Label));
-
-  l->size = size;
-  l->position = position;
 
   Control *c = malloc(sizeof(Control));
   c->control = l;
@@ -156,4 +151,24 @@ int updateLabel(void *c, RenderInfo *renderer) {
 
 Label * getLabel(Control *label) {
   return (Label *)label->control;
+}
+
+void setLabelZ(Control *label, unsigned int z) {
+  getLabel(label)->z_index = z;
+}
+
+void setLabelPosition(Control *label, Vector2 position) {
+  getLabel(label)->position = position;
+}
+
+void setLabelSize(Control *label, Vector2 size) {
+  getLabel(label)->size = size;
+}
+
+void setLabelColor(Control *label, Vector4 color) {
+  getLabel(label)->color = color;
+}
+
+void setLabelText(Control *label, char * text) {
+  getLabel(label)->text = text;
 }

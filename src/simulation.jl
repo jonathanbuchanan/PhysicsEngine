@@ -18,10 +18,15 @@ function setupMenus()
   setMenuSize(bottomMenu, vec2(640.0, 30.0))
   setMenuColor(bottomMenu, vec4(0.3, 0.3, 0.3, 1.0))
 
-#renderer->menu = createMenu();
-#renderer->menu.position = vec2(0.0, 0.0);
-#renderer->menu.size = vec2(100.0, 480.0);
-#renderer->menu.color = vec4(0.8, 0.8, 0.8, 0.5);
+  entityLabel = createLabel()
+  setLabelZ(entityLabel, 1)
+  setLabelSize(entityLabel, vec2(100.0, 30.0))
+  setLabelPosition(entityLabel, vec2(0.0, 0.0))
+  setLabelColor(entityLabel, vec4(1.0, 1.0, 1.0, 1.0))
+  setLabelText(entityLabel, "Label.")
+
+  addControlToMenu(bottomMenu, entityLabel)
+
 
 #button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
 #Button *b = getButton(&button);
