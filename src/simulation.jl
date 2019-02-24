@@ -16,34 +16,17 @@ function setupMenus()
   setMenuOrientation(bottomMenu, Horizontal)
   setMenuPosition(bottomMenu, vec2(0.0, 0.0))
   setMenuSize(bottomMenu, vec2(640.0, 30.0))
-  setMenuColor(bottomMenu, vec4(0.3, 0.3, 0.3, 1.0))
+  setMenuColor(bottomMenu, vec4(0.3, 0.3, 0.3, 0.1))
 
   entityLabel = createLabel()
   setLabelZ(entityLabel, 1)
   setLabelSize(entityLabel, vec2(100.0, 30.0))
   setLabelPosition(entityLabel, vec2(0.0, 0.0))
   setLabelColor(entityLabel, vec4(1.0, 1.0, 1.0, 1.0))
+  setLabelTextHeight(entityLabel, 20);
   setLabelText(entityLabel, "Label.")
 
   addControlToMenu(bottomMenu, entityLabel)
-
-
-#button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
-#Button *b = getButton(&button);
-#b->highlight = vec4(1.0, 1.0, 1.0, 1.0);
-#b->select = vec4(1.0, 0.0, 1.0, 1.0);
-#b->action = test_callback;
-#b->text = "Button";
-#b->textColor = vec4(0.5, 0.5, 0.5, 1.0);
-#b->z_index = 1;
-#addControlToMenu(&renderer->menu, &button);
-
-#label = createLabel(vec2(100.0, 100.0), vec2(0.0, 100.0));
-#Label *l = getLabel(&label);
-#l->color = vec4(1.0, 1.0, 1.0, 1.0);
-#l->text = "I am a label.";
-#l->z_index = 1;
-#addControlToMenu(&renderer->menu, &label);
 
   push!(menus, bottomMenu)
 

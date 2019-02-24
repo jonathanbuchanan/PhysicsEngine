@@ -16,6 +16,7 @@ int updateControl(Control *control, RenderInfo *renderer) {
 Menu * createMenu() {
   Menu *menu = malloc(sizeof(Menu));
 
+  menu->controls = NULL;
   menu->orientation = Vertical;
   menu->position = vec2(0.0, 0.0);
   menu->size = vec2(0.0, 0.0);
@@ -64,8 +65,6 @@ int updateMenu(Menu *menu, RenderInfo *renderer) {
   }
   return 0;
 }
-
-
 
 Control * createButton() {
   Button *b = malloc(sizeof(Button));
@@ -176,4 +175,8 @@ void setLabelColor(Control *label, Vector4 color) {
 
 void setLabelText(Control *label, char * text) {
   getLabel(label)->text = text;
+}
+
+void setLabelTextHeight(Control *label, int textHeight) {
+  getLabel(label)->textHeight = textHeight;
 }

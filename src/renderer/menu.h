@@ -96,5 +96,6 @@ void setLabelPosition(Control *label, Vector2 position);
 void setLabelSize(Control *label, Vector2 size);
 void setLabelColor(Control *label, Vector4 color);
 void setLabelText(Control *label, char * text);
+void setLabelTextHeight(Control *label, int textHeight);
 
 #endif

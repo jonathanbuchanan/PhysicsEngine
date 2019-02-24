@@ -137,6 +137,7 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   renderer->input.chars = NULL;
   renderer->input.actions = NULL;
   renderer->input.callbacks = NULL;
+  renderer->input.callbacks_n = 0;
 
   glfwSetWindowUserPointer(window, renderer);
 
@@ -179,6 +180,8 @@ RenderInfo * createRenderer(GLFWwindow *window) {
 
   renderer->quad2D = generateQuad();
   loadShape(&renderer->quad2D);
+
+  renderer->textRenderer = initTextRenderer();
 
   return renderer;
 }

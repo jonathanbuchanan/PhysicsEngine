@@ -5,7 +5,7 @@
 TextRenderInfo initTextRenderer() {
   TextRenderInfo textRenderer;
 
-  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);  
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
   int error = FT_Init_FreeType(&textRenderer.library);
   /*if (error)
@@ -575,6 +575,7 @@ void drawText(RenderInfo *renderer, const char *text, Vector2 position, Vector2 
 
   for (int i = 0; i < strlen(text); ++i) {
     char c = text[i];
+
     Glyph *g = &textRenderer->glyphs[c];
 
     Vector2 characterPos;
@@ -584,8 +585,8 @@ void drawText(RenderInfo *renderer, const char *text, Vector2 position, Vector2 
     Vector2 characterSize;
     characterSize = vec2(textRenderer->glyphs[c].size.x * scale, textRenderer->glyphs[c].size.y * scale);
 
-    renderer->quad2D.size = vec2(2 * (characterSize.x / windowSize.x), 2 * (characterSize.y / windowSize.y));
-    renderer->quad2D.position = vec2((2 * (characterPos.x / windowSize.x)) - 1.0 + (renderer->quad2D.size.x / 2), (2 * (characterPos.y / windowSize.y)) - 1.0 + (renderer->quad2D.size.y / 2));
+    renderer->quad2D.size = characterSize;
+    renderer->quad2D.position = characterPos;
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, g->textureID);
@@ -593,6 +594,13 @@ void drawText(RenderInfo *renderer, const char *text, Vector2 position, Vector2 
     Matrix4x4F model = matrix4x4toMatrix4x4F(shapeModelMatrix(&renderer->quad2D));
     unsigned int modelL = glGetUniformLocation(renderer->shader2DTextured, "model");
     glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
+
+    Matrix4x4F projection = matrix4x4toMatrix4x4F(orthographicProjectionMatrix(-1.0, 1.0, 0.0, windowSize.x, 0.0, windowSize.y));
+    unsigned int projectionL = glGetUniformLocation(renderer->shader2DTextured, "projection");
+    glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
+
+    unsigned int zPositionL = glGetUniformLocation(renderer->shader2DTextured, "zPosition");
+    glUniform1f(zPositionL, 0.9);
 
     unsigned int colorL = glGetUniformLocation(renderer->shader2DTextured, "color");
     glUniform4f(colorL, color.x, color.y, color.z, color.w);
