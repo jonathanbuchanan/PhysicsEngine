@@ -1,53 +1,54 @@
 function setupSimulation(simulation)
-  electron = Electron(vec3(1.0, 5.0, 5.0), vec3(0.008, 0.0, 0.0))
-  proton = Proton(vec3(-1.0, -5.0, 5.0), vec3(0.0, 0.0, 0.0))
-  neutron = Neutron(vec3(0.0, 0.0, 5.0), vec3(0.0, 0.0, 0.0))
+  electron = Electron(vec3(0.0, 3.0, 2.0), vec3(0.008, 0.0, -0.003))
+  proton = Proton(vec3(0.0, 0.0, 2.0), vec3(-0.0008, 0.0, 0.0003))
+  #neutron = Neutron(vec3(0.0, 0.0, 5.0), vec3(0.0, 0.0, 0.0))
 
   addParticle!(simulation, electron)
   addParticle!(simulation, proton)
-  addParticle!(simulation, neutron)
+  #addParticle!(simulation, neutron)
 end
+
+bottomMenu = nothing
+entityLabel = nothing
+timeLabel = nothing
 
 function setupMenus()
   menus = []
 
-  bottomMenu = createMenu()
+  global bottomMenu = createMenu()
 
   setMenuOrientation(bottomMenu, Horizontal)
   setMenuPosition(bottomMenu, vec2(0.0, 0.0))
-  setMenuSize(bottomMenu, vec2(640.0, 30.0))
+  setMenuSize(bottomMenu, vec2(1280.0, 20.0))
   setMenuColor(bottomMenu, vec4(0.3, 0.3, 0.3, 1.0))
 
-  entityLabel = createLabel()
+  global entityLabel = createLabel()
   setLabelZ(entityLabel, 1)
-  setLabelSize(entityLabel, vec2(100.0, 30.0))
-  setLabelPosition(entityLabel, vec2(0.0, 0.0))
+  setLabelSize(entityLabel, vec2(100.0, 15.0))
+  setLabelPosition(entityLabel, vec2(0.0, 2.5))
   setLabelColor(entityLabel, vec4(1.0, 1.0, 1.0, 1.0))
-  setLabelText(entityLabel, "Label.")
+  setLabelTextHeight(entityLabel, 15)
+  setLabelText(entityLabel, "Entities: N")
 
   addControlToMenu(bottomMenu, entityLabel)
 
+  global timeLabel = createLabel()
+  setLabelZ(timeLabel, 1)
+  setLabelSize(timeLabel, vec2(100.0, 15.0))
+  setLabelPosition(timeLabel, vec2(100.0, 2.5))
+  setLabelColor(timeLabel, vec4(1.0, 1.0, 1.0, 1.0))
+  setLabelTextHeight(timeLabel, 15)
+  setLabelText(timeLabel, "Time: 0")
 
-#button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
-#Button *b = getButton(&button);
-#b->highlight = vec4(1.0, 1.0, 1.0, 1.0);
-#b->select = vec4(1.0, 0.0, 1.0, 1.0);
-#b->action = test_callback;
-#b->text = "Button";
-#b->textColor = vec4(0.5, 0.5, 0.5, 1.0);
-#b->z_index = 1;
-#addControlToMenu(&renderer->menu, &button);
-
-#label = createLabel(vec2(100.0, 100.0), vec2(0.0, 100.0));
-#Label *l = getLabel(&label);
-#l->color = vec4(1.0, 1.0, 1.0, 1.0);
-#l->text = "I am a label.";
-#l->z_index = 1;
-#addControlToMenu(&renderer->menu, &label);
+  addControlToMenu(bottomMenu, timeLabel)
 
   push!(menus, bottomMenu)
 
   return menus
+end
+
+function resize(renderer, width, height)
+  setMenuSize(bottomMenu, vec2(convert(Float64, width), 20.0))
 end
 
 # Main simulation loop
@@ -56,13 +57,14 @@ function simulate()
   simulation = newSimulation()
 
   # Create the rendering setup
-  windowWidth = 640
-  windowHeight = 480
+  windowWidth = 1280
+  windowHeight = 720
   windowTitle = "Simulation"
 
   Renderer.init()
   window = Renderer.createWindow(windowWidth, windowHeight, windowTitle)
   renderer = Renderer.createRenderer(window)
+  Renderer.setResizeCallback(renderer, resize)
   camera = Renderer.getCamera(renderer)
 
   registerControls(renderer, camera)
@@ -79,14 +81,17 @@ function simulate()
 
   step = 0
   while Renderer.windowCloseStatus(window) != true
-    Renderer.render(renderer, simulation, menus)
-    #Renderer.cameraSetUp(camera, vec3(10 * sin(step), 10 * cos(step), 0.0))
-    #step += 0.01
-
     stepsperframe = 10
     for i = 1:stepsperframe
       simulationStep!(simulation)
     end
+
+    entityCount = length(simulation.objects)
+    setLabelText(entityLabel, "Entities: $entityCount")
+    time = simulation.time
+    setLabelText(timeLabel, "Time: $time")
+
+    Renderer.render(renderer, simulation, menus)
   end
 
   Renderer.terminate(renderer)

@@ -10,6 +10,7 @@ testFiles = [
   "vector_test.jl"
   "particle_test.jl"
   "renderer_test.jl"
+  "text_test.jl"
 ]
 
 for file in testFiles

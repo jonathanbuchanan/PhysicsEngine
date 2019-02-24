@@ -55,6 +55,10 @@ function setLabelColor(label, color)
   ccall((:setLabelColor, @fullLibraryPath), Cvoid, (Label, Vector4), label, color)
 end
 
+function setLabelTextHeight(label, textHeight)
+  ccall((:setLabelTextHeight, @fullLibraryPath), Cvoid, (Label, Cint), label, textHeight)
+end
+
 function setLabelText(label, text)
   ccall((:setLabelText, @fullLibraryPath), Cvoid, (Label, Cstring), label, text)
 end

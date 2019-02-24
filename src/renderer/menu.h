@@ -64,6 +64,7 @@ typedef struct Button {
   Vector4 select;
 
   Vector4 textColor;
+  int textHeight;
 
   const char *text;
 
@@ -81,6 +82,7 @@ typedef struct Label {
   unsigned int z_index;
 
   Vector4 color;
+  int textHeight;
 
   const char *text;
 } Label;
@@ -94,5 +96,6 @@ void setLabelPosition(Control *label, Vector2 position);
 void setLabelSize(Control *label, Vector2 size);
 void setLabelColor(Control *label, Vector4 color);
 void setLabelText(Control *label, char * text);
+void setLabelTextHeight(Control *label, int textHeight);
 
 #endif

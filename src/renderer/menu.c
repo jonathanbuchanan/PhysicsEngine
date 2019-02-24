@@ -1,6 +1,7 @@
 #include "menu.h"
 
 #include "render.h"
+#include "text.h"
 #include <stdlib.h>
 
 int drawControl(Control *control, RenderInfo *renderer, Vector2 offset) {
@@ -15,6 +16,7 @@ int updateControl(Control *control, RenderInfo *renderer) {
 Menu * createMenu() {
   Menu *menu = malloc(sizeof(Menu));
 
+  menu->controls = NULL;
   menu->orientation = Vertical;
   menu->position = vec2(0.0, 0.0);
   menu->size = vec2(0.0, 0.0);
@@ -64,8 +66,6 @@ int updateMenu(Menu *menu, RenderInfo *renderer) {
   return 0;
 }
 
-
-
 Control * createButton() {
   Button *b = malloc(sizeof(Button));
 
@@ -90,8 +90,8 @@ int drawButton(void *c, RenderInfo *renderer, Vector2 offset) {
   else if (button->state == Selected)
     color = button->select;
 
-  renderQuad(renderer, button->size, addVector2(button->position, offset), color, (float)button->z_index / (float)Z_INDEX_MAX);
-  renderText(renderer, button->text, addVector2(button->position, offset), button->textColor, (float)(button->z_index + 1) / (float)Z_INDEX_MAX);
+  renderQuad(renderer, button->size, button->position, color, button->z_index / Z_INDEX_MAX);
+  drawText(renderer, button->text, button->position, button->size, (float)button->textHeight / (float)FONT_SIZE, button->textColor);
 
   return 0;
 }
@@ -139,7 +139,11 @@ Control * createLabel() {
 int drawLabel(void *c, RenderInfo *renderer, Vector2 offset) {
   Label *label = (Label *)c;
 
-  renderText(renderer, label->text, addVector2(label->position, offset), label->color, (float)label->z_index / (float)Z_INDEX_MAX);
+  Vector2 windowSize = getWindowSize(renderer);
+
+  // Convert pixel coordinates to NDC
+  // Position specifies bottom left coordinates
+  drawText(renderer, label->text, label->position, label->size, (float)label->textHeight / (float)FONT_SIZE, label->color);
 
   return 0;
 }
@@ -171,4 +175,8 @@ void setLabelColor(Control *label, Vector4 color) {
 
 void setLabelText(Control *label, char * text) {
   getLabel(label)->text = text;
+}
+
+void setLabelTextHeight(Control *label, int textHeight) {
+  getLabel(label)->textHeight = textHeight;
 }

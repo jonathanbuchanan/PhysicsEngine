@@ -9,16 +9,8 @@
 
 #include "model.h"
 #include "menu.h"
+#include "text.h"
 #include "camera.h"
-
-#define GLYPH_COUNT 128
-
-typedef struct Glyph {
-  GLuint textureID;
-  Vector2 size;
-  Vector2 bearing;
-  double advance;
-} Glyph;
 
 typedef enum Key {
   Unknown = -1,
@@ -167,17 +159,16 @@ typedef struct InputInfo {
 } InputInfo;
 
 typedef GLuint ShaderProgram;
+typedef void(* WindowResizeCallback)(RenderInfo *, int, int);
 typedef struct RenderInfo {
   GLFWwindow *window;
-
-  FT_Library fontLibrary;
-  FT_Face fontFace;
-  Glyph glyphs[GLYPH_COUNT];
 
   // Shaders
   ShaderProgram shader3D;
   ShaderProgram shader2D;
   ShaderProgram shader2DTextured;
+
+  TextRenderInfo textRenderer;
 
   Camera camera;
 
@@ -185,6 +176,8 @@ typedef struct RenderInfo {
 
   Shape quad2D; // The quad used for 2D rendering
   Menu menu;
+
+  WindowResizeCallback resizeCallback;
 
   InputInfo input;
 } RenderInfo;
@@ -209,5 +202,6 @@ void swapBuffers(GLFWwindow *window);
 void setClearColor(GLFWwindow *window, float red, float green, float blue, float alpha);
 
 void addKeyCallback(RenderInfo *renderer, Key key, KeyAction action, KeyCallbackFunction callback);
+void setResizeCallback(RenderInfo *renderer, WindowResizeCallback callback);
 
 #endif
