@@ -22,6 +22,7 @@ typedef struct Model {
 
   Vector3 position;
   Vector3 eulerRotation;
+  Vector3 scale;
 } Model;
 
 // Loads the model data into OpenGL buffers
@@ -43,6 +44,9 @@ Model generateUVSphere(float radius, int latDivisions, int longDivisions);
 
 // Generates a sphere by subdividing an icosahedron and projecting each point onto the sphere
 Model generateIcoSphere(float radius, int subdivisions);
+
+// Generates a cube (size = side_length / 2)
+Model generateCube(float size);
 
 
 // A 2D shape

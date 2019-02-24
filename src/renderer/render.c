@@ -11,18 +11,16 @@ static const char *vertex_shader_3D =
 "uniform mat4 model;\n"
 "uniform mat4 view;\n"
 "uniform mat4 projection;\n"
-"out vec3 color;\n"
 "void main() {\n"
 "    gl_Position = projection * view * model * vec4(pos, 1.0);\n"
-"    color = pos;\n"
 "}\n";
 
 static const char *fragment_shader_3D =
 "#version 330 core\n"
-"in vec3 color;\n"
+"uniform vec3 color;\n"
 "out vec4 FragColor;\n"
 "void main() {\n"
-"    FragColor = vec4((color / 2) + vec3(0.5, 0.5, 0.5), 1.0);\n"
+"    FragColor = vec4(color, 1.0);\n"
 "}\n";
 
 
@@ -31,8 +29,11 @@ static const char *vertex_shader_2D =
 "#version 330 core\n"
 "layout (location = 0) in vec2 pos;\n"
 "uniform mat4 model;\n"
+"uniform mat4 projection;\n"
+"uniform float zPosition;\n"
 "void main() {\n"
-"    gl_Position = model * vec4(pos, 0.0, 1.0);\n"
+"    gl_Position = projection * model * vec4(pos, 0.0, 1.0);\n"
+"    gl_Position.z = -zPosition;\n"
 "}\n";
 
 static const char *fragment_shader_2D =
@@ -50,10 +51,12 @@ static const char *vertex_shader_2D_textured =
 "layout (location = 0) in vec2 pos;\n"
 "layout (location = 1) in vec2 textureCoordinates;\n"
 "uniform mat4 model;\n"
+"uniform mat4 projection;\n"
+"uniform float zPosition;\n"
 "out vec2 texCoords;\n"
 "void main() {\n"
-"    gl_Position = model * vec4(pos, 0.0, 1.0);\n"
-"    gl_Position.z = -0.5;\n" // <-- Eliminate this hard-wire
+"    gl_Position = projection * model * vec4(pos, 0.0, 1.0);\n"
+"    gl_Position.z = -zPosition;\n"
 "    texCoords = textureCoordinates;\n"
 "}\n";
 
@@ -101,8 +104,25 @@ ShaderProgram compileShader(const char *vertex_shader_source, const char *fragme
   return program;
 }
 
-void test_callback(Button *b) {
-  printf("press\n");
+
+
+void checkKeys(RenderInfo *renderer) {
+  for (int i = 0; i < renderer->input.callbacks_n; ++i) {
+    int key = renderer->input.chars[i];
+    int action = renderer->input.actions[i];
+    int previousState = renderer->input.keystates[key];
+    int state = glfwGetKey(renderer->window, key);
+    if (previousState == 0 && state == 1 && action == Press) renderer->input.callbacks[i](renderer, key);
+    if (previousState == 1 && state == 0 && action == Release) renderer->input.callbacks[i](renderer, key);
+    if (previousState == 1 && state == 1 && action == Repeat) renderer->input.callbacks[i](renderer, key);
+  }
+  for (int i = LOWEST_KEY; i < HIGHEST_KEY; ++i) {
+    renderer->input.keystates[i] = glfwGetKey(renderer->window, i);
+  }
+}
+
+void windowResizeCallback(GLFWwindow *window, int width, int height) {
+  // Resize menus
 }
 
 Control button;
@@ -110,15 +130,21 @@ Control label;
 RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
 
+  glfwSetWindowSizeCallback(window, windowResizeCallback);
+
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
 
-  renderer->textRenderer = initTextRenderer();
+  renderer->input.chars = NULL;
+  renderer->input.actions = NULL;
+  renderer->input.callbacks = NULL;
+
+  glfwSetWindowUserPointer(window, renderer);
 
   renderer->window = window;
 
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   GLuint vao;
   glGenVertexArrays(1, &vao);
@@ -144,45 +170,36 @@ RenderInfo * createRenderer(GLFWwindow *window) {
     renderer->shader2DTextured = shader2DTextured;
   }
 
-  renderer->model = generateIcoSphere(1.0, 3);
-  loadModel(&renderer->model);
+  renderer->camera.position = vec3(0.0, 0.0, -10.0);
+  renderer->camera.target = vec3(0.0, 0.0, 0.0);
+  renderer->camera.up = vec3(0.0, 1.0, 0.0);
+
+  renderer->sphere = generateIcoSphere(1.0, 2);
+  loadModel(&renderer->sphere);
 
   renderer->quad2D = generateQuad();
   loadShape(&renderer->quad2D);
 
-  renderer->menu = createMenu();
-  button = createButton(vec2(100.0, 100.0), vec2(0.0, 0.0));
-  Button *b = getButton(&button);
-  b->highlight = vec4(1.0, 1.0, 1.0, 1.0);
-  b->select = vec4(1.0, 0.0, 1.0, 1.0);
-  b->action = test_callback;
-  b->text = "Button";
-  b->textColor = vec4(0.5, 0.5, 0.5, 1.0);
-  b->textHeight = 32;
-  addControlToMenu(&renderer->menu, &button);
-
-  label = createLabel(vec2(100.0, 100.0), vec2(100.0, 100.0));
-  Label *l = getLabel(&label);
-  l->color = vec4(1.0, 1.0, 1.0, 1.0);
-  l->text = "I am a label.";
-  l->textHeight = 64;
-  addControlToMenu(&renderer->menu, &label);
-
   return renderer;
 }
 
+Camera * getCamera(RenderInfo *renderer) {
+  return &renderer->camera;
+}
+
 void freeRenderer(RenderInfo *renderer) {
-  freeModel(&renderer->model);
+  freeModel(&renderer->sphere);
   freeShape(&renderer->quad2D);
 
   destroyTextRenderer(&renderer->textRenderer);
 }
 
-double step = 0.0;
-void render(RenderInfo *renderer) {
+void beginRender(RenderInfo *renderer) {
   GLFWwindow *window = renderer->window;
 
   glfwMakeContextCurrent(window);
+
+  checkKeys(renderer);
 
   // Set the viewport
   int height, width;
@@ -191,55 +208,71 @@ void render(RenderInfo *renderer) {
 
   // Clear
   clear(window);
+}
 
-  // Draw
-  glUseProgram(renderer->shader3D);
+void endRender(RenderInfo *renderer) {
+  GLFWwindow *window = renderer->window;
 
-  renderer->model.position = vec3(0.0, 2.0 * sin(step), -3.0);
-  renderer->model.eulerRotation = vec3(step, 0.5 * step, 2.0 * step);
-  step += 0.01;
-  Matrix4x4F model = matrix4x4toMatrix4x4F(modelMatrix(&renderer->model));
-  unsigned int modelL = glGetUniformLocation(renderer->shader3D, "model");
-  glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
-
-  Matrix4x4F view = matrix4x4toMatrix4x4F(translationMatrix(vec3(0.0, 0.0, -2.0)));
-  unsigned int viewL = glGetUniformLocation(renderer->shader3D, "view");
-  glUniformMatrix4fv(viewL, 1, GL_TRUE, (GLfloat *)&view.a11);
-
-  Matrix4x4F projection = matrix4x4toMatrix4x4F(perspectiveProjectionMatrix(0.1, 100.0, DEGREES_TO_RADIANS(45.0), (double)(640.0 / 480.0)));
-  unsigned int projectionL = glGetUniformLocation(renderer->shader3D, "projection");
-  glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
-
-  drawModel(&renderer->model);
-
-
-
-  ((Button *)button.control)->color = vec4(fabs(sin(step * 0.4)), fabs(cos(step * 0.2)), fabs(sin(step * 0.55)), 1.0);
-
-  glUseProgram(renderer->shader2D);
-
-  updateMenu(&renderer->menu, renderer);
-  drawMenu(&renderer->menu, renderer);
-
-  // Swap the buffers
   swapBuffers(window);
   glfwPollEvents();
 }
 
-void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color) {
+void renderSphere(RenderInfo *renderer, float radius, Vector3 color, Vector3 position) {
+  // Draw
+  glUseProgram(renderer->shader3D);
+
+  int height, width;
+  glfwGetFramebufferSize(renderer->window, &width, &height);
+  glViewport(0, 0, width, height);
+
+  renderer->sphere.position = position;
+  renderer->sphere.scale = vec3(radius, radius, radius);
+
+  Matrix4x4F model = matrix4x4toMatrix4x4F(modelMatrix(&renderer->sphere));
+  unsigned int modelL = glGetUniformLocation(renderer->shader3D, "model");
+  glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
+
+  Matrix4x4F view = matrix4x4toMatrix4x4F(getViewMatrix(&renderer->camera));
+  unsigned int viewL = glGetUniformLocation(renderer->shader3D, "view");
+  glUniformMatrix4fv(viewL, 1, GL_TRUE, (GLfloat *)&view.a11);
+
+  Matrix4x4F projection = matrix4x4toMatrix4x4F(perspectiveProjectionMatrix(0.1, 100.0, DEGREES_TO_RADIANS(45.0), (double)(width) / (double)(height)));
+  unsigned int projectionL = glGetUniformLocation(renderer->shader3D, "projection");
+  glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
+
+  unsigned int colorL = glGetUniformLocation(renderer->shader3D, "color");
+  glUniform3f(colorL, color.x, color.y, color.z);
+
+  drawModel(&renderer->sphere);
+}
+
+void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color, double z) {
   glUseProgram(renderer->shader2D);
 
   renderer->quad2D.size = size;
   renderer->quad2D.position = position;
 
+  Vector2 windowSize = getWindowSize(renderer);
+
   Matrix4x4F model = matrix4x4toMatrix4x4F(shapeModelMatrix(&renderer->quad2D));
   unsigned int modelL = glGetUniformLocation(renderer->shader2D, "model");
   glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
+
+  Matrix4x4F projection = matrix4x4toMatrix4x4F(orthographicProjectionMatrix(-1.0, 1.0, 0.0, windowSize.x, 0.0, windowSize.y));
+  unsigned int projectionL = glGetUniformLocation(renderer->shader2D, "projection");
+  glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
+
+  unsigned int zPositionL = glGetUniformLocation(renderer->shader2D, "zPosition");
+  glUniform1f(zPositionL, z);
 
   unsigned int colorL = glGetUniformLocation(renderer->shader2D, "color");
   glUniform4f(colorL, color.x, color.y, color.z, color.w);
 
   drawShape(&renderer->quad2D);
+}
+
+void renderMenu(RenderInfo *renderer, Menu *menu) {
+  drawMenu(menu, renderer);
 }
 
 Vector2 getWindowSize(const RenderInfo *renderer) {
@@ -278,3 +311,14 @@ void setClearColor(GLFWwindow *window, float red, float green, float blue, float
   glClearColor(red, green, blue, alpha);
 }
 
+void addKeyCallback(RenderInfo *renderer, Key key, KeyAction action, KeyCallbackFunction callback) {
+  renderer->input.callbacks_n += 1;
+
+  renderer->input.chars = realloc(renderer->input.chars, renderer->input.callbacks_n * sizeof(Key));
+  renderer->input.actions = realloc(renderer->input.actions, renderer->input.callbacks_n * sizeof(KeyAction));
+  renderer->input.callbacks = realloc(renderer->input.callbacks, renderer->input.callbacks_n * sizeof(KeyCallbackFunction));
+
+  renderer->input.chars[renderer->input.callbacks_n - 1] = key;
+  renderer->input.actions[renderer->input.callbacks_n - 1] = action;
+  renderer->input.callbacks[renderer->input.callbacks_n - 1] = callback;
+}

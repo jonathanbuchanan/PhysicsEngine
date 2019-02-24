@@ -4,8 +4,8 @@
 #include "text.h"
 #include <stdlib.h>
 
-int drawControl(Control *control, RenderInfo *renderer) {
-  return (control->draw)(control->control, renderer);
+int drawControl(Control *control, RenderInfo *renderer, Vector2 offset) {
+  return (control->draw)(control->control, renderer, offset);
 }
 
 int updateControl(Control *control, RenderInfo *renderer) {
@@ -13,21 +13,47 @@ int updateControl(Control *control, RenderInfo *renderer) {
 }
 
 
+Menu * createMenu() {
+  Menu *menu = malloc(sizeof(Menu));
 
-Menu createMenu() {
-  Menu m = (Menu){};
-  return m;
+  menu->orientation = Vertical;
+  menu->position = vec2(0.0, 0.0);
+  menu->size = vec2(0.0, 0.0);
+  menu->color = vec4(0.0, 0.0, 0.0, 0.0);
+  menu->z_index = 0;
+  menu->controls_n = 0;
+
+  return menu;
 }
 
 void addControlToMenu(Menu *menu, Control *control) {
-  menu->controls = realloc(menu->controls, sizeof(Control *) * menu->controls_n);
+  menu->controls = realloc(menu->controls, sizeof(Control *) * (menu->controls_n + 0));
   menu->controls[menu->controls_n] = control;
   ++menu->controls_n;
 }
 
+void setMenuOrientation(Menu *menu, MenuOrientation orientation) {
+  menu->orientation = orientation;
+}
+
+void setMenuPosition(Menu *menu, Vector2 position) {
+  menu->position = position;
+}
+
+void setMenuSize(Menu *menu, Vector2 size) {
+  menu->size = size;
+}
+
+void setMenuColor(Menu *menu, Vector4 color) {
+  menu->color = color;
+}
+
 int drawMenu(Menu *menu, RenderInfo *renderer) {
+  // Draw the background
+  renderQuad(renderer, menu->size, menu->position, menu->color, menu->z_index / Z_INDEX_MAX);
+
   for (int i = 0; i < menu->controls_n; ++i) {
-    drawControl(menu->controls[i], renderer);
+    drawControl(menu->controls[i], renderer, menu->position);
   }
   return 0;
 }
@@ -41,27 +67,21 @@ int updateMenu(Menu *menu, RenderInfo *renderer) {
 
 
 
-Control createButton(Vector2 size, Vector2 position) {
+Control * createButton() {
   Button *b = malloc(sizeof(Button));
 
   b->state = Normal;
-  b->size = size;
-  b->position = position;
 
-  Control c = {b, drawButton, updateButton};
+  Control *c = malloc(sizeof(Control));
+  c->control = b;
+  c->draw = drawButton;
+  c->update = updateButton;
 
   return c;
 }
 
-int drawButton(void *c, RenderInfo *renderer) {
+int drawButton(void *c, RenderInfo *renderer, Vector2 offset) {
   Button *button = (Button *)c;
-
-  Vector2 windowSize = getWindowSize(renderer);
-
-  // Convert pixel coordinates to NDC
-  // Position specifies bottom left coordinates
-  Vector2 size = (Vector2){2 * (button->size.x / windowSize.x), 2 * (button->size.y / windowSize.y)};
-  Vector2 position = (Vector2){(2 * (button->position.x / windowSize.x)) - 1.0 + (size.x / 2), (2 * (button->position.y / windowSize.y)) - 1.0 + (size.y / 2)};
 
   Vector4 color;
   if (button->state == Normal)
@@ -69,10 +89,10 @@ int drawButton(void *c, RenderInfo *renderer) {
   else if (button->state == Highlighted)
     color = button->highlight;
   else if (button->state == Selected)
-    color = button->select; 
-  
-  renderQuad(renderer, size, position, color);
-  drawText(renderer, button->text, position, size, (float)button->textHeight / (float)FONT_SIZE, button->textColor);
+    color = button->select;
+
+  renderQuad(renderer, button->size, button->position, color, button->z_index / Z_INDEX_MAX);
+  drawText(renderer, button->text, button->position, button->size, (float)button->textHeight / (float)FONT_SIZE, button->textColor);
 
   return 0;
 }
@@ -106,18 +126,18 @@ Button * getButton(Control *button) {
 
 
 
-Control createLabel(Vector2 size, Vector2 position) {
+Control * createLabel() {
   Label *l = malloc(sizeof(Label));
 
-  l->size = size;
-  l->position = position;
-
-  Control c = {l, drawLabel, updateLabel};
+  Control *c = malloc(sizeof(Control));
+  c->control = l;
+  c->draw = drawLabel;
+  c->update = updateLabel;
 
   return c;
 }
 
-int drawLabel(void *c, RenderInfo *renderer) {
+int drawLabel(void *c, RenderInfo *renderer, Vector2 offset) {
   Label *label = (Label *)c;
 
   Vector2 windowSize = getWindowSize(renderer);
@@ -136,4 +156,24 @@ int updateLabel(void *c, RenderInfo *renderer) {
 
 Label * getLabel(Control *label) {
   return (Label *)label->control;
+}
+
+void setLabelZ(Control *label, unsigned int z) {
+  getLabel(label)->z_index = z;
+}
+
+void setLabelPosition(Control *label, Vector2 position) {
+  getLabel(label)->position = position;
+}
+
+void setLabelSize(Control *label, Vector2 size) {
+  getLabel(label)->size = size;
+}
+
+void setLabelColor(Control *label, Vector4 color) {
+  getLabel(label)->color = color;
+}
+
+void setLabelText(Control *label, char * text) {
+  getLabel(label)->text = text;
 }

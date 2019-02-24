@@ -50,8 +50,9 @@ Matrix4x4 modelMatrix(Model *model) {
   Matrix4x4 rotX = rotationXMatrix(model->eulerRotation.x);
   Matrix4x4 rotY = rotationYMatrix(model->eulerRotation.y);
   Matrix4x4 rotZ = rotationZMatrix(model->eulerRotation.z);
+  Matrix4x4 scale = scalingMatrix(vec3(model->scale.x, model->scale.y, model->scale.z));
 
-  return MATMUL(MATMUL(MATMUL(translation, rotX), rotY), rotZ);
+  return MATMUL(MATMUL(MATMUL(MATMUL(translation, rotX), rotY), rotZ), scale);
 }
 
 
@@ -256,16 +257,65 @@ Model generateIcoSphere(float radius, int subdivisions) {
   return model;
 }
 
+Model generateCube(float size) {
+  Model model;
+
+  float vertices[] = {
+    -1.0, -1.0, -1.0,
+    -1.0, -1.0, 1.0,
+    -1.0, 1.0, -1.0,
+    -1.0, 1.0, 1.0,
+    1.0, -1.0, -1.0,
+    1.0, -1.0, 1.0,
+    1.0, 1.0, -1.0,
+    1.0, 1.0, 1.0
+  };
+
+  for (int i = 0; i < 3 * 8; ++i) {
+    vertices[i] = vertices[i] * size;
+  }
+
+  model.vertices_n = 3 * 8;
+  model.vertices = malloc(sizeof(float) * 3 * 8);
+  memcpy(model.vertices, vertices, 3 * 8 * sizeof(float));
+
+  unsigned int indices[] = {
+    0, 1, 2,
+    1, 2, 3,
+
+    4, 5, 6,
+    5, 6, 7,
+
+    2, 3, 6,
+    3, 6, 7,
+
+    0, 1, 4,
+    1, 4, 5,
+
+    0, 2, 4,
+    2, 4, 6,
+
+    1, 3, 5,
+    3, 5, 7
+  };
+
+  model.indices_n = 3 * 12;
+  model.indices = malloc(sizeof(unsigned int) * model.indices_n);
+  memcpy(model.indices, indices, 3 * 12 * sizeof(unsigned int));
+
+  return model;
+}
+
 
 Shape generateQuad() {
   Shape q;
 
   // x, y, u, v
   const float quad_vertices[] = {
-    -1.0, -1.0, 0.0, 1.0,
-    -1.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 1.0,
+    0.0, 1.0, 0.0, 0.0,
     1.0, 1.0, 1.0, 0.0,
-    1.0, -1.0, 1.0, 1.0
+    1.0, 0.0, 1.0, 1.0
   };
 
   const unsigned int quad_indices[] = {
@@ -318,13 +368,13 @@ int drawShape(Shape *s) {
   glBindVertexArray(s->mesh.vao);
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
   glBindVertexArray(0);
- 
+
 
   return 0;
 }
 
 Matrix4x4 shapeModelMatrix(Shape *s) {
-  Matrix4x4 scale = scalingMatrix(vec3(s->size.x / 2.0, s->size.y / 2.0, 0.0));
+  Matrix4x4 scale = scalingMatrix(vec3(s->size.x, s->size.y, 0.0));
   Matrix4x4 translation = translationMatrix(vec3(s->position.x, s->position.y, 0.0));
 
   return MATMUL(translation, scale);
