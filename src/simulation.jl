@@ -8,17 +8,18 @@ function setupSimulation(simulation)
   #addParticle!(simulation, neutron)
 end
 
+bottomMenu = nothing
 entityLabel = nothing
 timeLabel = nothing
 
 function setupMenus()
   menus = []
 
-  bottomMenu = createMenu()
+  global bottomMenu = createMenu()
 
   setMenuOrientation(bottomMenu, Horizontal)
   setMenuPosition(bottomMenu, vec2(0.0, 0.0))
-  setMenuSize(bottomMenu, vec2(640.0, 20.0))
+  setMenuSize(bottomMenu, vec2(1280.0, 20.0))
   setMenuColor(bottomMenu, vec4(0.3, 0.3, 0.3, 1.0))
 
   global entityLabel = createLabel()
@@ -46,19 +47,24 @@ function setupMenus()
   return menus
 end
 
+function resize(renderer, width, height)
+  setMenuSize(bottomMenu, vec2(convert(Float64, width), 20.0))
+end
+
 # Main simulation loop
 function simulate()
   # Create the simulation
   simulation = newSimulation()
 
   # Create the rendering setup
-  windowWidth = 640
-  windowHeight = 480
+  windowWidth = 1280
+  windowHeight = 720
   windowTitle = "Simulation"
 
   Renderer.init()
   window = Renderer.createWindow(windowWidth, windowHeight, windowTitle)
   renderer = Renderer.createRenderer(window)
+  Renderer.setResizeCallback(renderer, resize)
   camera = Renderer.getCamera(renderer)
 
   registerControls(renderer, camera)

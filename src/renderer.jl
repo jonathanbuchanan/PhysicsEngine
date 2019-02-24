@@ -103,6 +103,10 @@ function addKeyCallback(renderer::RenderInfo, callback, key, action)
   ccall((:addKeyCallback, @fullLibraryPath), Cvoid, (RenderInfo, Cint, Cint, Ptr{Cvoid}), renderer, key, action, @cfunction($callback, Cvoid, (RenderInfo, Cint)))
 end
 
+function setResizeCallback(renderer, callback)
+  ccall((:setResizeCallback, @fullLibraryPath), Cvoid, (RenderInfo, Ptr{Cvoid}), renderer, @cfunction($callback, Cvoid, (RenderInfo, Cint, Cint)))
+end
+
 @enum Key begin
   Unknown = -1
   Space = 32

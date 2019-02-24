@@ -123,6 +123,9 @@ void checkKeys(RenderInfo *renderer) {
 
 void windowResizeCallback(GLFWwindow *window, int width, int height) {
   // Resize menus
+  RenderInfo *renderer = (RenderInfo *)glfwGetWindowUserPointer(window);
+
+  renderer->resizeCallback(renderer, width, height);
 }
 
 Control button;
@@ -324,4 +327,8 @@ void addKeyCallback(RenderInfo *renderer, Key key, KeyAction action, KeyCallback
   renderer->input.chars[renderer->input.callbacks_n - 1] = key;
   renderer->input.actions[renderer->input.callbacks_n - 1] = action;
   renderer->input.callbacks[renderer->input.callbacks_n - 1] = callback;
+}
+
+void setResizeCallback(RenderInfo *renderer, WindowResizeCallback callback) {
+  renderer->resizeCallback = callback;
 }
