@@ -193,6 +193,7 @@ void renderSphere(RenderInfo *renderer, float radius, Vector3 color, Vector3 pos
 void renderQuad(RenderInfo *renderer, Vector2 size, Vector2 position, Vector4 color, double z);
 void renderText(RenderInfo *renderer, const char *text, Vector2 position, Vector4 color, double z);
 void renderMenu(RenderInfo *renderer, Menu *menu);
+void renderOrientation(RenderInfo *renderer);
 
 Vector2 getWindowSize(const RenderInfo *renderer);
 Vector2 getCursorPosition(const RenderInfo *renderer);

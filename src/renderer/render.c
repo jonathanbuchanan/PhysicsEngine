@@ -281,6 +281,65 @@ void renderMenu(RenderInfo *renderer, Menu *menu) {
   drawMenu(menu, renderer);
 }
 
+void renderOrientation(RenderInfo *renderer) {
+  // Data
+  char *labels[] = {"X", "Y", "Z"};
+  Vector3 axes[] = {vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0)};
+  Vector3 colors[] = {vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0)};
+
+  Vector2 windowSize = getWindowSize(renderer);
+
+  // Draw
+  for (int i = 0; i < 3; ++i) {
+    char *label = labels[i];
+    Vector3 axis = axes[i];
+    Vector3 color = colors[i];
+
+    Model cube = generateCube(1.0);
+    loadModel(&cube);
+
+    glUseProgram(renderer->shader3D);
+
+    int height, width;
+    glfwGetFramebufferSize(renderer->window, &width, &height);
+    glViewport(0, 0, width, height);
+
+    float aspectRatio = height / width;
+
+    cube.position = vec3(0.0, 0.0, 0.0);
+    cube.eulerRotation = vec3(0.0, 0.0, 0.0);
+    if (i == 0) {
+      cube.scale = vec3(0.5, 0.01, 0.01);
+      cube.position = vec3(0.5, 0.0, 0.0);
+    } else if (i == 1) {
+      cube.scale = vec3(0.01, 0.5, 0.01);
+      cube.position = vec3(0.0, 0.5, 0.0);
+    } else if (i == 2) {
+      cube.scale = vec3(0.01, 0.01, 0.5);
+      cube.position = vec3(0.0, 0.0, 0.5);
+    }
+
+    Matrix4x4F model = matrix4x4toMatrix4x4F(modelMatrix(&cube));
+    unsigned int modelL = glGetUniformLocation(renderer->shader3D, "model");
+    glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
+
+    Vector3 orientation = subtractVector3(renderer->camera.target, renderer->camera.position);
+    Matrix4x4 camera = lookAt(orientation, vec3(0.0, 0.0, 0.0), renderer->camera.up);
+    Matrix4x4F view = matrix4x4toMatrix4x4F(camera);
+    unsigned int viewL = glGetUniformLocation(renderer->shader3D, "view");
+    glUniformMatrix4fv(viewL, 1, GL_TRUE, (GLfloat *)&view.a11);
+
+    Matrix4x4F projection = matrix4x4toMatrix4x4F(multiplyMatrix4x4(multiplyMatrix4x4(orthographicProjectionMatrix(-3.0, 3.0, -1.0, 1.0, -1.0, 1.0), scalingMatrix(vec3(0.1/* * aspectRatio*/, 0.1, 0.0))), translationMatrix(vec3(9.0, 9.0, 0.0))));
+    unsigned int projectionL = glGetUniformLocation(renderer->shader3D, "projection");
+    glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
+
+    unsigned int colorL = glGetUniformLocation(renderer->shader3D, "color");
+    glUniform3f(colorL, color.x, color.y, color.z);
+
+    drawModel(&cube);
+  }
+}
+
 Vector2 getWindowSize(const RenderInfo *renderer) {
   int width, height;
   glfwGetWindowSize(renderer->window, &width, &height);
