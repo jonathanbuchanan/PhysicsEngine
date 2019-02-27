@@ -323,7 +323,7 @@ void renderOrientation(RenderInfo *renderer) {
     unsigned int modelL = glGetUniformLocation(renderer->shader3D, "model");
     glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
 
-    Vector3 orientation = subtractVector3(renderer->camera.target, renderer->camera.position);
+    Vector3 orientation = subtract3(renderer->camera.target, renderer->camera.position);
     Matrix4x4 camera = lookAt(orientation, vec3(0.0, 0.0, 0.0), renderer->camera.up);
     Matrix4x4F view = matrix4x4toMatrix4x4F(camera);
     unsigned int viewL = glGetUniformLocation(renderer->shader3D, "view");

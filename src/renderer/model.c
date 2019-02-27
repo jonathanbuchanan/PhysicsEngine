@@ -153,8 +153,7 @@ Model generateIcoSphere(float radius, int subdivisions) {
   int index = 0;
   for (int i = 0; i < 12; ++i) {
     Vector3 vertex = vec3(model.vertices[index], model.vertices[index + 1], model.vertices[index + 2]);
-    double magnitude = magnitudeVector3(vertex);
-    vertex = vec3(vertex.x / magnitude, vertex.y / magnitude, vertex.z / magnitude);
+    vertex = normalize3(vertex);
     model.vertices[index] = vertex.x;
     model.vertices[index + 1] = vertex.y;
     model.vertices[index + 2] = vertex.z;
@@ -245,8 +244,8 @@ Model generateIcoSphere(float radius, int subdivisions) {
     index = 0;
     for (int i = 0; i < model.vertices_n / 3; ++i) {
       Vector3 vertex = vec3(model.vertices[index], model.vertices[index + 1], model.vertices[index + 2]);
-      double magnitude = magnitudeVector3(vertex);
-      vertex = vec3(vertex.x / magnitude, vertex.y / magnitude, vertex.z / magnitude);
+      double magnitude = magnitude3(vertex);
+      vertex = normalize3(vertex);
       model.vertices[index] = vertex.x;
       model.vertices[index + 1] = vertex.y;
       model.vertices[index + 2] = vertex.z;

@@ -1,7 +1,7 @@
 function w_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
   forward = Renderer.cameraGetTarget(camera) - Renderer.cameraGetPosition(camera)
-  forward_norm = vec3(forward.x * (0.1 / magnitude(forward)),
+  forward_norm = Vector3(forward.x * (0.1 / magnitude(forward)),
     forward.y * (0.1 / magnitude(forward)),
     forward.z * (0.1 / magnitude(forward)))
   Renderer.cameraSetPosition(camera, Renderer.cameraGetPosition(camera) + (forward_norm))
@@ -12,17 +12,17 @@ end
 function a_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
   forward = Renderer.cameraGetTarget(camera) - Renderer.cameraGetPosition(camera)
-  forward_norm = vec3(forward.x * (1 / magnitude(forward)),
+  forward_norm = Vector3(forward.x * (1 / magnitude(forward)),
     forward.y * (1 / magnitude(forward)),
     forward.z * (1 / magnitude(forward)))
 
   up = Renderer.cameraGetUp(camera)
-  up_norm = vec3(up.x * (1 / magnitude(up)),
+  up_norm = Vector3(up.x * (1 / magnitude(up)),
     up.y * (1 / magnitude(up)),
     up.z * (1 / magnitude(up)))
 
   left = up * forward
-  left_norm = vec3(left.x * (0.1 / magnitude(left)),
+  left_norm = Vector3(left.x * (0.1 / magnitude(left)),
     left.y * (0.1 / magnitude(left)),
     left.z * (0.1 / magnitude(left)))
   Renderer.cameraSetPosition(camera, Renderer.cameraGetPosition(camera) + left_norm)
@@ -33,7 +33,7 @@ end
 function s_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
   forward = Renderer.cameraGetTarget(camera) - Renderer.cameraGetPosition(camera)
-  forward_norm = vec3(forward.x * (-0.1 / magnitude(forward)),
+  forward_norm = Vector3(forward.x * (-0.1 / magnitude(forward)),
     forward.y * (-0.1 / magnitude(forward)),
     forward.z * (-0.1 / magnitude(forward)))
   Renderer.cameraSetPosition(camera, Renderer.cameraGetPosition(camera) + (forward_norm))
@@ -44,17 +44,17 @@ end
 function d_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
   forward = Renderer.cameraGetTarget(camera) - Renderer.cameraGetPosition(camera)
-  forward_norm = vec3(forward.x * (1 / magnitude(forward)),
+  forward_norm = Vector3(forward.x * (1 / magnitude(forward)),
     forward.y * (1 / magnitude(forward)),
     forward.z * (1 / magnitude(forward)))
 
   up = Renderer.cameraGetUp(camera)
-  up_norm = vec3(up.x * (1 / magnitude(up)),
+  up_norm = Vector3(up.x * (1 / magnitude(up)),
     up.y * (1 / magnitude(up)),
     up.z * (1 / magnitude(up)))
 
   left = forward * up
-  left_norm = vec3(left.x * (0.1 / magnitude(left)),
+  left_norm = Vector3(left.x * (0.1 / magnitude(left)),
     left.y * (0.1 / magnitude(left)),
     left.z * (0.1 / magnitude(left)))
   Renderer.cameraSetPosition(camera, Renderer.cameraGetPosition(camera) + left_norm)
@@ -65,7 +65,7 @@ end
 function space_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
   up = Renderer.cameraGetUp(camera)
-  up_norm = vec3(up.x * (0.1 / magnitude(up)),
+  up_norm = Vector3(up.x * (0.1 / magnitude(up)),
     up.y * (0.1 / magnitude(up)),
     up.z * (0.1 / magnitude(up)))
   Renderer.cameraSetPosition(camera, Renderer.cameraGetPosition(camera) + up_norm)
@@ -75,7 +75,7 @@ end
 function rshift_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
   up = Renderer.cameraGetUp(camera)
-  up_norm = vec3(up.x * (-0.1 / magnitude(up)),
+  up_norm = Vector3(up.x * (-0.1 / magnitude(up)),
     up.y * (-0.1 / magnitude(up)),
     up.z * (-0.1 / magnitude(up)))
   Renderer.cameraSetPosition(camera, Renderer.cameraGetPosition(camera) + up_norm)
@@ -88,28 +88,28 @@ pitch = 0.0
 function leftarrow_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
   global yaw = yaw + 0.02
-  new_direction = vec3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
+  new_direction = Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
   Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
 end
 
 function rightarrow_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
   global yaw = yaw - 0.02
-  new_direction = vec3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
+  new_direction = Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
   Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
 end
 
 function uparrow_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
   global pitch = pitch + 0.02
-  new_direction = vec3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
+  new_direction = Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
   Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
 end
 
 function downarrow_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
   global pitch = pitch - 0.02
-  new_direction = vec3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
+  new_direction = Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
   Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
 end
 
