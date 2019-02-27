@@ -82,19 +82,34 @@ function rshift_pressed(renderer, key)
   Renderer.cameraSetTarget(camera, Renderer.cameraGetTarget(camera) + up_norm)
 end
 
-theta = 0.0
+yaw = 0.0
+pitch = 0.0
 
 function leftarrow_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
-  global theta = theta + 0.02
-  new_direction = vec3(sin(theta), 0.0, cos(theta))
+  global yaw = yaw + 0.02
+  new_direction = vec3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
   Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
 end
 
 function rightarrow_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
-  global theta = theta - 0.02
-  new_direction = vec3(sin(theta), 0.0, cos(theta))
+  global yaw = yaw - 0.02
+  new_direction = vec3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
+  Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
+end
+
+function uparrow_pressed(renderer, key)
+  camera = Renderer.getCamera(renderer)
+  global pitch = pitch + 0.02
+  new_direction = vec3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
+  Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
+end
+
+function downarrow_pressed(renderer, key)
+  camera = Renderer.getCamera(renderer)
+  global pitch = pitch - 0.02
+  new_direction = vec3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
   Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
 end
 
@@ -122,4 +137,10 @@ function registerControls(renderer, camera)
 
   Renderer.addKeyCallback(renderer, rightarrow_pressed, Renderer.KeyRight, Renderer.Press)
   Renderer.addKeyCallback(renderer, rightarrow_pressed, Renderer.KeyRight, Renderer.Repeat)
+
+  Renderer.addKeyCallback(renderer, uparrow_pressed, Renderer.KeyUp, Renderer.Press)
+  Renderer.addKeyCallback(renderer, uparrow_pressed, Renderer.KeyUp, Renderer.Repeat)
+
+  Renderer.addKeyCallback(renderer, downarrow_pressed, Renderer.KeyDown, Renderer.Press)
+  Renderer.addKeyCallback(renderer, downarrow_pressed, Renderer.KeyDown, Renderer.Repeat)
 end
