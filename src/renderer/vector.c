@@ -244,15 +244,10 @@ Matrix4x4 orthographicProjectionMatrix(double zNear, double zFar, double left, d
 }
 
 Matrix4x4 lookAt(Vector3 eye, Vector3 center, Vector3 up) {
-  Vector3 f = subtract3(center, eye);
-  Vector3 f_norm = normalize3(f);
-
-  Vector3 up_norm = normalize3(up);
-
-  Vector3 s = cross(f_norm, up_norm);
-  Vector3 s_norm = normalize3(s);
-
-  Vector3 u = cross(s_norm, f_norm);
+  Vector3 f = normalize3(subtract3(center, eye));
+  Vector3 u = normalize3(up);
+  Vector3 s = normalize3(cross(f, u));
+  u = cross(s, f);
 
   Matrix4x4 result = {0};
 
@@ -264,9 +259,9 @@ Matrix4x4 lookAt(Vector3 eye, Vector3 center, Vector3 up) {
   result.a22 = u.y;
   result.a23 = u.z;
 
-  result.a31 = -f_norm.x;
-  result.a32 = -f_norm.y;
-  result.a33 = -f_norm.z;
+  result.a31 = -f.x;
+  result.a32 = -f.y;
+  result.a33 = -f.z;
 
   result.a44 = 1;
 
