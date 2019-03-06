@@ -292,7 +292,7 @@ void renderOrientation(RenderInfo *renderer) {
 
   Vector2 windowSize = getWindowSize(renderer);
 
-  // Draw
+  // Draw Axes
   for (int i = 0; i < 3; ++i) {
     char *label = labels[i];
     Vector3 axis = axes[i];
@@ -304,7 +304,7 @@ void renderOrientation(RenderInfo *renderer) {
     glfwGetFramebufferSize(renderer->window, &width, &height);
     glViewport(0, 0, width, height);
 
-    float aspectRatio = height / width;
+    float aspectRatio = (float)height / (float)width;
 
     renderer->cube.position = vec3(0.0, 0.0, 0.0);
     renderer->cube.eulerRotation = vec3(0.0, 0.0, 0.0);
@@ -323,13 +323,13 @@ void renderOrientation(RenderInfo *renderer) {
     unsigned int modelL = glGetUniformLocation(renderer->shader3D, "model");
     glUniformMatrix4fv(modelL, 1, GL_TRUE, (GLfloat *)&model.a11);
 
-    Vector3 orientation = subtract3(renderer->camera.target, renderer->camera.position);
+    Vector3 orientation = subtract3(renderer->camera.position, renderer->camera.target);
     Matrix4x4 camera = lookAt(orientation, vec3(0.0, 0.0, 0.0), renderer->camera.up);
     Matrix4x4F view = matrix4x4toMatrix4x4F(camera);
     unsigned int viewL = glGetUniformLocation(renderer->shader3D, "view");
     glUniformMatrix4fv(viewL, 1, GL_TRUE, (GLfloat *)&view.a11);
 
-    Matrix4x4F projection = matrix4x4toMatrix4x4F(multiplyMatrix4x4(multiplyMatrix4x4(orthographicProjectionMatrix(-3.0, 3.0, -1.0, 1.0, -1.0, 1.0), scalingMatrix(vec3(0.1/* * aspectRatio*/, 0.1, 0.0))), translationMatrix(vec3(9.0, 9.0, 0.0))));
+    Matrix4x4F projection = matrix4x4toMatrix4x4F(multiplyMatrix4x4(multiplyMatrix4x4(orthographicProjectionMatrix(-3.0, 3.0, -1.0, 1.0, -1.0, 1.0), translationMatrix(vec3(0.8, 0.8, 0.0))), scalingMatrix(vec3(0.1 * aspectRatio, 0.1, 0.0))));
     unsigned int projectionL = glGetUniformLocation(renderer->shader3D, "projection");
     glUniformMatrix4fv(projectionL, 1, GL_TRUE, (GLfloat *)&projection.a11);
 
@@ -337,6 +337,36 @@ void renderOrientation(RenderInfo *renderer) {
     glUniform3f(colorL, color.x, color.y, color.z);
 
     drawModel(&renderer->cube);
+  }
+
+  // Draw Axis Labels
+  for (int i = 0; i < 3; ++i) {
+    Vector4 position;
+    if (i == 0)
+      position = vec4(1.5, 0.0, 0.0, 1.0);
+    else if (i == 1)
+      position = vec4(0.0, 1.5, 0.0, 1.0);
+    else if (i == 2)
+      position = vec4(0.0, 0.0, 1.5, 1.0);
+
+    int height, width;
+    glfwGetFramebufferSize(renderer->window, &width, &height);
+    glViewport(0, 0, width, height);
+
+    float aspectRatio = (float)height / (float)width;
+
+    Vector3 orientation = subtract3(renderer->camera.position, renderer->camera.target);
+    Matrix4x4 camera = lookAt(orientation, vec3(0.0, 0.0, 0.0), renderer->camera.up);
+    Matrix4x4 projection = multiplyMatrix4x4(multiplyMatrix4x4(orthographicProjectionMatrix(-3.0, 3.0, -1.0, 1.0, -1.0, 1.0), translationMatrix(vec3(0.8, 0.8, 0.0))), scalingMatrix(vec3(0.1 * aspectRatio, 0.1, 0.0)));
+
+    Matrix4x4 mvp = MATMUL(projection, camera);
+
+    Vector4 transformed = matrix4x4timesVector4(mvp, position);
+    //Vector2 pos = vec2(transformed.x * (width / 2), transformed.y * (height / 2));
+    Vector2 pos = vec2((transformed.x * (width / 4)) + (width / 4), (transformed.y * (height / 4)) + (height / 4));
+    printf("Axis: %d, x: %f, y: %f\n", i, pos.x, pos.y);
+
+    drawText(renderer, labels[i], pos, vec2(25.0, 12.0), 0.2, vec4(1.0, 0.0, 1.0, 1.0));
   }
 }
 
