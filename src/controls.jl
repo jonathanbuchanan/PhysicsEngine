@@ -101,14 +101,18 @@ end
 
 function uparrow_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
-  global pitch = pitch + 0.02
+  if pitch < (pi / 2) - 0.02
+    global pitch = pitch + 0.02
+  end
   new_direction = Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
   Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
 end
 
 function downarrow_pressed(renderer, key)
   camera = Renderer.getCamera(renderer)
-  global pitch = pitch - 0.02
+  if pitch > (pi / -2) + 0.02
+    global pitch = pitch - 0.02
+  end
   new_direction = Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch))
   Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
 end

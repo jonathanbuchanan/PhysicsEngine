@@ -85,6 +85,8 @@ function render(renderer::RenderInfo, simulation, menus)
 
   ccall((:renderOrientation, @fullLibraryPath), Cvoid, (RenderInfo,), renderer)
 
+  ccall((:renderGrid, @fullLibraryPath), Cvoid, (RenderInfo,), renderer)
+
   # End Render
   ccall((:endRender, @fullLibraryPath), Cvoid, (RenderInfo,), renderer)
 end
