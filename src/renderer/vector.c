@@ -3,61 +3,87 @@
 #include <stdlib.h>
 #include <math.h>
 
-Vector2 addVector2(Vector2 a, Vector2 b) {
-  return (Vector2){a.x + b.x, a.y + b.y};
-}
-
-Vector2 subtractVector2(Vector2 a, Vector2 b) {
-  return (Vector2){a.x - b.x, a.y - b.y};
-}
-
-double dotProduct2(Vector2 a, Vector2 b) {
-  return (a.x * b.x) + (a.y * b.y);
-}
-
-double magnitudeVector2(Vector2 v) {
-  return sqrt((v.x * v.x) + (v.y * v.y));
-}
-
+// ## Vector2
 Vector2 vec2(double x, double y) {
   return (Vector2){x, y};
 }
 
-
-double * accessVector3(Vector3 *v, int row) {
+double * access2(Vector2 *v, int row) {
   if (row == 0) { return &v->x; }
   else if (row == 1) { return &v->y; }
-  else if (row == 2) { return &v->x; }
   else { return NULL; }
 }
 
-Vector3 addVector3(Vector3 a, Vector3 b) {
-  return (Vector3){a.x + b.x, a.y + b.y, a.z + b.z};
+Vector2 add2(Vector2 a, Vector2 b) {
+  return (Vector2){a.x + b.x, a.y + b.y};
 }
 
-Vector3 subtractVector3(Vector3 a, Vector3 b) {
-  return (Vector3){a.x - b.x, a.y - b.y, a.z - b.z};
+Vector2 subtract2(Vector2 a, Vector2 b) {
+  return (Vector2){a.x - b.x, a.y - b.y};
 }
 
-double dotProduct(Vector3 a, Vector3 b) {
-  return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+double dot2(Vector2 a, Vector2 b) {
+  return (a.x * b.x) + (a.y * b.y);
 }
 
-Vector3 crossProduct(Vector3 a, Vector3 b) {
-  return (Vector3){(a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x)};
+Vector2 scalar2(Vector2 v, double s) {
+  return (Vector2){v.x * s, v.y * s};
 }
 
-double magnitudeVector3(Vector3 v) {
-  return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+double magnitude2(Vector2 v) {
+  return sqrt((v.x * v.x) + (v.y * v.y));
 }
 
+Vector2 normalize2(Vector2 v) {
+  return scalar2(v, 1 / magnitude2(v));
+}
+
+// ## Vector3
 Vector3 vec3(double x, double y, double z) {
   return (Vector3){x, y, z};
 }
 
+double * access3(Vector3 *v, int row) {
+  if (row == 0) { return &v->x; }
+  else if (row == 1) { return &v->y; }
+  else if (row == 2) { return &v->z; }
+  else { return NULL; }
+}
 
+Vector3 add3(Vector3 a, Vector3 b) {
+  return (Vector3){a.x + b.x, a.y + b.y, a.z + b.z};
+}
 
-double * accessVector4(Vector4 *v, int row) {
+Vector3 subtract3(Vector3 a, Vector3 b) {
+  return (Vector3){a.x - b.x, a.y - b.y, a.z - b.z};
+}
+
+double dot3(Vector3 a, Vector3 b) {
+  return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+}
+
+Vector3 cross(Vector3 a, Vector3 b) {
+  return (Vector3){(a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x)};
+}
+
+Vector3 scalar3(Vector3 v, double s) {
+  return (Vector3){v.x * s, v.y * s, v.z * s};
+}
+
+double magnitude3(Vector3 v) {
+  return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+}
+
+Vector3 normalize3(Vector3 v) {
+  return scalar3(v, 1 / magnitude3(v));
+}
+
+// ## Vector4
+Vector4 vec4(double x, double y, double z, double w) {
+  return (Vector4){x, y, z, w};
+}
+
+double * access4(Vector4 *v, int row) {
   if (row == 0) { return &v->x; }
   else if (row == 1) { return &v->y; }
   else if (row == 2) { return &v->z; }
@@ -65,27 +91,29 @@ double * accessVector4(Vector4 *v, int row) {
   else { return NULL; }
 }
 
-Vector4 addVector4(Vector4 a, Vector4 b) {
+Vector4 add4(Vector4 a, Vector4 b) {
   return (Vector4){a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w};
 }
 
-Vector4 subtractVector4(Vector4 a, Vector4 b) {
+Vector4 subtract4(Vector4 a, Vector4 b) {
   return (Vector4){a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w};
 }
 
-double dotProduct4(Vector4 a, Vector4 b) {
+double dot4(Vector4 a, Vector4 b) {
   return (a.x * b.x) + (a.y * b.y) + (a.z * b.z) + (a.w * b.w);
 }
 
-double magnitudeVector4(Vector4 v) {
+Vector4 scalar4(Vector4 v, double s) {
+  return (Vector4){v.x * s, v.y * s, v.z * s, v.w * s};
+}
+
+double magnitude4(Vector4 v) {
   return sqrt((v.x * v.x) + (v.y * v.y) + (v.z * v.z) + (v.w * v.w));
 }
 
-Vector4 vec4(double x, double y, double z, double w) {
-  return (Vector4){x, y, z, w};
+Vector4 normalize4(Vector4 v) {
+  return scalar4(v, 1 / magnitude4(v));
 }
-
-
 
 double * accessMatrix4x4(Matrix4x4 *m, int row, int column) {
   if (row == 0 && column == 0) { return &m->a11; }
@@ -176,10 +204,10 @@ Vector4 matrix4x4timesVector4(Matrix4x4 a, Vector4 b) {
     double value = 0;
     for (int i = 0; i < 4; ++i) {
       double aValue = *accessMatrix4x4(&a, row, i);
-      double bValue = *accessVector4(&b, i);
+      double bValue = *access4(&b, i);
       value += aValue * bValue;
     }
-    *accessVector4(&result, row) = value;
+    *access4(&result, row) = value;
   }
   return result;
 }
@@ -216,18 +244,10 @@ Matrix4x4 orthographicProjectionMatrix(double zNear, double zFar, double left, d
 }
 
 Matrix4x4 lookAt(Vector3 eye, Vector3 center, Vector3 up) {
-  Vector3 f = subtractVector3(center, eye);
-  double f_length = magnitudeVector3(f);
-  Vector3 f_norm = vec3(f.x / f_length, f.y / f_length, f.z / f_length);
-
-  double up_length = magnitudeVector3(up);
-  Vector3 up_norm = vec3(up.x / up_length, up.y / up_length, up.z / up_length);
-
-  Vector3 s = crossProduct(f_norm, up_norm);
-  double s_length = magnitudeVector3(s);
-  Vector3 s_norm = vec3(s.x / s_length, s.y / s_length, s.z / s_length);
-
-  Vector3 u = crossProduct(s_norm, f_norm);
+  Vector3 f = normalize3(subtract3(center, eye));
+  Vector3 u = normalize3(up);
+  Vector3 s = normalize3(cross(f, u));
+  u = cross(s, f);
 
   Matrix4x4 result = {0};
 
@@ -239,9 +259,9 @@ Matrix4x4 lookAt(Vector3 eye, Vector3 center, Vector3 up) {
   result.a22 = u.y;
   result.a23 = u.z;
 
-  result.a31 = -f_norm.x;
-  result.a32 = -f_norm.y;
-  result.a33 = -f_norm.z;
+  result.a31 = -f.x;
+  result.a32 = -f.y;
+  result.a33 = -f.z;
 
   result.a44 = 1;
 
