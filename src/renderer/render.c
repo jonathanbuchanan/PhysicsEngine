@@ -362,9 +362,7 @@ void renderOrientation(RenderInfo *renderer) {
     Matrix4x4 mvp = MATMUL(projection, camera);
 
     Vector4 transformed = matrix4x4timesVector4(mvp, position);
-    //Vector2 pos = vec2(transformed.x * (width / 2), transformed.y * (height / 2));
     Vector2 pos = vec2((transformed.x * (width / 4)) + (width / 4), (transformed.y * (height / 4)) + (height / 4));
-    printf("Axis: %d, x: %f, y: %f\n", i, pos.x, pos.y);
 
     drawText(renderer, labels[i], pos, vec2(25.0, 12.0), 0.2, vec4(1.0, 0.0, 1.0, 1.0));
   }
