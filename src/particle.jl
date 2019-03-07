@@ -59,3 +59,8 @@ end
 function particleMass(::Neutron)
   return 10
 end
+
+# Kinetic Energy
+function kineticEnergy(particle)
+  return 0.5 * particleMass(particle) * magnitude(particle.velocity) * magnitude(particle.velocity)
+end

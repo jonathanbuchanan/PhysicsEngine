@@ -143,7 +143,7 @@ int drawLabel(void *c, RenderInfo *renderer, Vector2 offset) {
 
   // Convert pixel coordinates to NDC
   // Position specifies bottom left coordinates
-  drawText(renderer, label->text, label->position, label->size, (float)label->textHeight / (float)FONT_SIZE, label->color);
+  drawText(renderer, label->text, add2(label->position, offset), label->size, (float)label->textHeight / (float)FONT_SIZE, label->color);
 
   return 0;
 }

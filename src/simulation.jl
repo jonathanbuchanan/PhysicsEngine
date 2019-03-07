@@ -1,3 +1,5 @@
+using Printf
+
 function setupSimulation(simulation)
   electron = Electron(Vector3(0.0, 3.0, 2.0), Vector3(0.008, 0.0, -0.003))
   proton = Proton(Vector3(0.0, 0.0, 2.0), Vector3(-0.0008, 0.0, 0.0003))
@@ -11,6 +13,10 @@ end
 bottomMenu = nothing
 entityLabel = nothing
 timeLabel = nothing
+
+inspectorMenu = nothing
+inspectorLabel = nothing
+kineticEnergyLabel = nothing
 
 function setupMenus()
   menus = []
@@ -43,6 +49,47 @@ function setupMenus()
   addControlToMenu(bottomMenu, timeLabel)
 
   push!(menus, bottomMenu)
+
+
+
+  global inspectorMenu = createMenu()
+
+  setMenuOrientation(inspectorMenu, Vertical)
+  setMenuPosition(inspectorMenu, Vector2(20.0, 200.0))
+  setMenuSize(inspectorMenu, Vector2(200.0, 400.0))
+  setMenuColor(inspectorMenu, Vector4(0.3, 0.3, 0.3, 1.0))
+
+  push!(menus, inspectorMenu)
+
+  global inspectorLabel = createLabel()
+  setLabelZ(inspectorLabel, 1)
+  setLabelSize(inspectorLabel, Vector2(180.0, 15.0))
+  setLabelPosition(inspectorLabel, Vector2(10.0, 380.0))
+  setLabelColor(inspectorLabel, Vector4(1.0, 1.0, 1.0, 1.0))
+  setLabelTextHeight(inspectorLabel, 15)
+  setLabelText(inspectorLabel, "Inspector")
+
+  addControlToMenu(inspectorMenu, inspectorLabel)
+
+  global positionLabel = createLabel()
+  setLabelZ(positionLabel, 1)
+  setLabelSize(positionLabel, Vector2(180.0, 15.0))
+  setLabelPosition(positionLabel, Vector2(10.0, 360.0))
+  setLabelColor(positionLabel, Vector4(1.0, 1.0, 1.0, 1.0))
+  setLabelTextHeight(positionLabel, 15)
+  setLabelText(positionLabel, "Position: ( , , )")
+
+  addControlToMenu(inspectorMenu, positionLabel)
+
+  global kineticEnergyLabel = createLabel()
+  setLabelZ(kineticEnergyLabel, 1)
+  setLabelSize(kineticEnergyLabel, Vector2(180.0, 15.0))
+  setLabelPosition(kineticEnergyLabel, Vector2(10.0, 340.0))
+  setLabelColor(kineticEnergyLabel, Vector4(1.0, 1.0, 1.0, 1.0))
+  setLabelTextHeight(kineticEnergyLabel, 15)
+  setLabelText(kineticEnergyLabel, "Kinetic Energy: ")
+
+  addControlToMenu(inspectorMenu, kineticEnergyLabel)
 
   return menus
 end
@@ -91,10 +138,17 @@ function simulate()
     time = simulation.time
     setLabelText(timeLabel, "Time: $time")
 
+    inspectorReadout(simulation.objects[1])
+
     Renderer.render(renderer, simulation, menus)
   end
 
   Renderer.terminate(renderer)
+end
+
+function inspectorReadout(particle)
+  setLabelText(positionLabel, Printf.@sprintf("Position: (%0.2f, %0.2f, %0.2f)", particle.position.x, particle.position.y, particle.position.z))
+  setLabelText(kineticEnergyLabel, Printf.@sprintf("Kinetic Energy: %0.2f", kineticEnergy(particle) * 1000))
 end
 
 # Contains a particle and the necessary rendering handle
