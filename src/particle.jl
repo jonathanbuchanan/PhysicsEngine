@@ -60,6 +60,19 @@ function particleMass(::Neutron)
   return 10
 end
 
+# Radius
+function particleRadius(::Electron)
+  return 0.04
+end
+
+function particleRadius(::Proton)
+  return 0.3
+end
+
+function particleRadius(::Neutron)
+  return 0.3
+end
+
 # Kinetic Energy
 function kineticEnergy(particle)
   return 0.5 * particleMass(particle) * magnitude(particle.velocity) * magnitude(particle.velocity)

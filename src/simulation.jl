@@ -138,6 +138,8 @@ function simulate()
       simulationStep!(simulation)
     end
 
+    Renderer.pickObject(renderer, simulation)
+
     entityCount = length(simulation.objects)
     setLabelText(entityLabel, "Entities: $entityCount")
     time = simulation.time

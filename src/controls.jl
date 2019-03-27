@@ -118,7 +118,6 @@ function downarrow_pressed(renderer, key)
 end
 
 function clickCallback(renderer, button, action, mods)
-  Renderer.pickObject(renderer)
   return
 end
 

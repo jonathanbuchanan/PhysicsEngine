@@ -200,6 +200,8 @@ void renderMenu(RenderInfo *renderer, Menu *menu);
 void renderOrientation(RenderInfo *renderer);
 void renderGrid(RenderInfo *renderer);
 
+Matrix4x4 projectionMatrix(RenderInfo *renderer);
+
 Vector2 getWindowSize(const RenderInfo *renderer);
 Vector2 getCursorPosition(const RenderInfo *renderer);
 int isLeftMouseButtonPressed(const RenderInfo *renderer);

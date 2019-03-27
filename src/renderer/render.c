@@ -502,6 +502,13 @@ void renderGrid(RenderInfo *renderer) {
   }
 }
 
+Matrix4x4 projectionMatrix(RenderInfo *renderer) {
+  int height, width;
+  glfwGetFramebufferSize(renderer->window, &width, &height);
+
+  return perspectiveProjectionMatrix(0.1, 100.0, DEGREES_TO_RADIANS(45.0), (double)(width) / (double)(height));
+}
+
 Vector2 getWindowSize(const RenderInfo *renderer) {
   int width, height;
   glfwGetWindowSize(renderer->window, &width, &height);
