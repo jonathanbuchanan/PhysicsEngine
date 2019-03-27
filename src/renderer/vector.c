@@ -156,6 +156,96 @@ Matrix4x4 multiplyMatrix4x4(Matrix4x4 a, Matrix4x4 b) {
   return result;
 }
 
+void swapRows(Matrix4x4 *m, int rowA, int rowB) {
+  for (int col = 0; col < 4; ++col) {
+    float a = *accessMatrix4x4(m, rowA, col);
+    float b = *accessMatrix4x4(m, rowB, col);
+    *accessMatrix4x4(m, rowA, col) = b;
+    *accessMatrix4x4(m, rowB, col) = a;
+  }
+}
+
+void scaleRow(Matrix4x4 *m, int row, float factor) {
+  for (int col = 0; col < 4; ++col) {
+    *accessMatrix4x4(m, row, col) = *accessMatrix4x4(m, row, col) * factor;
+  }
+}
+
+void addRow(Matrix4x4 *m, int toRow, int fromRow, float factor) {
+  for (int col = 0; col < 4; ++col) {
+    *accessMatrix4x4(m, toRow, col) = *accessMatrix4x4(m, toRow, col) + (*accessMatrix4x4(m, fromRow, col) * factor);
+  }
+}
+
+#include <stdio.h>
+
+void printMatrix4x4(Matrix4x4 m) {
+  for (int row = 0; row < 4; ++row) {
+    if (row == 0) {
+      printf("(");
+    } else {
+      printf(" ");
+    }
+    for (int col = 0; col < 4; ++col) {
+      double el = *accessMatrix4x4(&m, row, col);
+      if (col == 3) {
+        printf("%.2f", el);
+      } else {
+        printf("%.2f,", el);
+      }
+    }
+    if (row == 3) {
+      printf(")\n");
+    } else {
+      printf("\n");
+    }
+  }
+}
+
+Matrix4x4 inverseMatrix4x4(Matrix4x4 m) {
+  // Gaussian elimination
+  Matrix4x4 toIdent = m;
+  Matrix4x4 toInvert = identityMatrix4x4();
+  for (int col = 0; col < 4; ++col) {
+    // Are we in a pivot column?
+    // Find the first nonzero entry in this column
+    int operatingRow = -1;
+    for (int row = col; row < 4; ++row) {
+      if (*accessMatrix4x4(&m, row, col) != 0.0) {
+        operatingRow = row;
+        break;
+      }
+    }
+
+    // Skip this column if it isn't a pivot
+    if (operatingRow == -1)
+      continue;
+
+    // Take the first nonzero row and swap it to the pivot position
+    int pivotRow = col;
+    swapRows(&toIdent, operatingRow, pivotRow);
+    swapRows(&toInvert, operatingRow, pivotRow);
+
+    // Make its leading entry a 1
+    float leading = *accessMatrix4x4(&toIdent, pivotRow, col);
+    scaleRow(&toIdent, pivotRow, 1 / leading);
+    scaleRow(&toInvert, pivotRow, 1 / leading);
+
+    // For each non pivot row, find the ratio of its entry in the current column to the pivot row entry, divide, and subtract
+    for (int row = 0; row < 4; ++row) {
+      if (row == pivotRow)
+        continue;
+
+      // Subtract
+      leading = *accessMatrix4x4(&toIdent, row, col);
+      addRow(&toIdent, row, pivotRow, -1 * leading);
+      addRow(&toInvert, row, pivotRow, -1 * leading);
+    }
+  }
+
+  return toInvert;
+}
+
 Matrix4x4 identityMatrix4x4() {
   return (Matrix4x4){1, 0, 0, 0,
                      0, 1, 0, 0,

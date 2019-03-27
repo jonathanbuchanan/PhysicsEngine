@@ -13,6 +13,7 @@ end
 bottomMenu = nothing
 entityLabel = nothing
 timeLabel = nothing
+pauseButton = nothing
 
 inspectorMenu = nothing
 inspectorLabel = nothing
@@ -49,6 +50,10 @@ function setupMenus()
   addControlToMenu(bottomMenu, timeLabel)
 
   push!(menus, bottomMenu)
+
+  #global pauseButton = createButton()
+
+  #addControlToMenu(bottomMenu, pauseButton)
 
 
 

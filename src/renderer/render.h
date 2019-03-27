@@ -148,6 +148,7 @@ typedef struct RenderInfo RenderInfo;
 #define HIGHEST_KEY 348
 
 typedef void(* KeyCallbackFunction)(RenderInfo *, int);
+typedef void(* ClickCallbackFunction)(RenderInfo *, int, int, int);
 typedef struct InputInfo {
   Key *chars;
   KeyAction *actions;
@@ -156,6 +157,8 @@ typedef struct InputInfo {
   int callbacks_n;
 
   int keystates[HIGHEST_KEY];
+
+  ClickCallbackFunction clickCallback;
 } InputInfo;
 
 typedef GLuint ShaderProgram;
@@ -206,5 +209,6 @@ void setClearColor(GLFWwindow *window, float red, float green, float blue, float
 
 void addKeyCallback(RenderInfo *renderer, Key key, KeyAction action, KeyCallbackFunction callback);
 void setResizeCallback(RenderInfo *renderer, WindowResizeCallback callback);
+void setClickCallback(RenderInfo *renderer, ClickCallbackFunction callback);
 
 #endif

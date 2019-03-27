@@ -117,6 +117,11 @@ function downarrow_pressed(renderer, key)
   Renderer.cameraSetTarget(camera, Renderer.cameraGetPosition(camera) + new_direction)
 end
 
+function clickCallback(renderer, button, action, mods)
+  Renderer.pickObject(renderer)
+  return
+end
+
 function registerControls(renderer, camera)
   Renderer.addKeyCallback(renderer, w_pressed, Renderer.KeyW, Renderer.Press)
   Renderer.addKeyCallback(renderer, w_pressed, Renderer.KeyW, Renderer.Repeat)
@@ -147,4 +152,6 @@ function registerControls(renderer, camera)
 
   Renderer.addKeyCallback(renderer, downarrow_pressed, Renderer.KeyDown, Renderer.Press)
   Renderer.addKeyCallback(renderer, downarrow_pressed, Renderer.KeyDown, Renderer.Repeat)
+
+  Renderer.setClickCallback(renderer, clickCallback)
 end

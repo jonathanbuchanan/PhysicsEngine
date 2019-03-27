@@ -128,12 +128,20 @@ void windowResizeCallback(GLFWwindow *window, int width, int height) {
   renderer->resizeCallback(renderer, width, height);
 }
 
+void mouseCallback(GLFWwindow *window, int button, int action, int mods) {
+  RenderInfo *renderer = (RenderInfo *)glfwGetWindowUserPointer(window);
+
+  renderer->input.clickCallback(renderer, button, action, mods);
+}
+
 Control button;
 Control label;
 RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
 
   glfwSetWindowSizeCallback(window, windowResizeCallback);
+
+  glfwSetMouseButtonCallback(window, mouseCallback);
 
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
 
@@ -544,4 +552,8 @@ void addKeyCallback(RenderInfo *renderer, Key key, KeyAction action, KeyCallback
 
 void setResizeCallback(RenderInfo *renderer, WindowResizeCallback callback) {
   renderer->resizeCallback = callback;
+}
+
+void setClickCallback(RenderInfo *renderer, ClickCallbackFunction callback) {
+  renderer->input.clickCallback = callback;
 }

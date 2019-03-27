@@ -1,7 +1,9 @@
 module Renderer
 
 import ..@fullLibraryPath
+import ..Vector2
 import ..Vector3
+import ..Vector4
 
 import ..Electron, ..Proton, ..Neutron
 
@@ -109,6 +111,18 @@ end
 
 function setResizeCallback(renderer, callback)
   ccall((:setResizeCallback, @fullLibraryPath), Cvoid, (RenderInfo, Ptr{Cvoid}), renderer, @cfunction($callback, Cvoid, (RenderInfo, Cint, Cint)))
+end
+
+function setClickCallback(renderer, callback)
+  ccall((:setClickCallback, @fullLibraryPath), Cvoid, (RenderInfo, Ptr{Cvoid}), renderer, @cfunction($callback, Cvoid, (RenderInfo, Cint, Cint, Cint)))
+end
+
+function getCursorPosition(renderer)
+  return ccall((:getCursorPosition, @fullLibraryPath), Vector2, (RenderInfo,), renderer)
+end
+
+function getWindowSize(renderer)
+  return ccall((:getWindowSize, @fullLibraryPath), Vector2, (RenderInfo,), renderer)
 end
 
 @enum Key begin
@@ -241,6 +255,13 @@ end
   Repeat = 2
 end
 
+@enum MouseButton begin
+  MouseButtonLast = 7
+  MouseButtonLeft = 0
+  MouseButtonMiddle = 2
+  MouseButtonRight = 1
+end
+
 const Camera = Ptr{Cvoid}
 
 function getCamera(renderer::RenderInfo)
@@ -269,6 +290,26 @@ end
 
 function cameraSetUp(camera::Camera, up::Vector3)
   return ccall((:cameraSetUp, @fullLibraryPath), Cvoid, (Camera, Vector3), camera, up)
+end
+
+function pickObject(renderer::RenderInfo)
+  cursor = getCursorPosition(renderer)
+  window = getWindowSize(renderer)
+
+  ray = Vector3(((2.0 * cursor.x) / window.x) - 1.0,
+    1.0 - ((2.0 * cursor.y) / window.y),
+    1.0)
+  clipRay = Vector4(ray.x, ray.y, -1.0, 1.0)
+
+  #inverseProjection =
+  #eyeRay = inverseProjection * clipRay
+  #eyeRay = Vector4(eyeRay.x, eyeRay.y, -1.0, 0.0)
+
+  #inverseView =
+  #worldRay = inverseView * eyeRay
+  #worldRay = normalize(Vector4(worldRay.x, worldRay.y, -1.0, 0.0))
+
+
 end
 
 end

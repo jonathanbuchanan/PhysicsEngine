@@ -111,6 +111,10 @@ function identityMatrix()
   return ccall((:identityMatrix4x4, @fullLibraryPath), Matrix4x4, ())
 end
 
+function invertMatrix(m)
+  return ccall((:inverseMatrix4x4, @fullLibraryPath), Matrix4x4, (Matrix4x4,), m)
+end
+
 function translationMatrix(translation::Vector3)
   return ccall((:translationMatrix, @fullLibraryPath), Matrix4x4, (Vector3,), translation)
 end
