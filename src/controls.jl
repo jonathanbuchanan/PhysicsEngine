@@ -118,6 +118,7 @@ function downarrow_pressed(renderer, key)
 end
 
 function clickCallback(renderer, button, action, mods)
+  global selectionIndex = Renderer.pickObject(renderer, simulation)
   return
 end
 

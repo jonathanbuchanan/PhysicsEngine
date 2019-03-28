@@ -75,6 +75,14 @@ Control * createButton();
 int drawButton(void *c, RenderInfo *renderer, Vector2 offset);
 int updateButton(void *c, RenderInfo *renderer);
 Button * getButton(Control *button);
+void setButtonZ(Control *button, unsigned int z);
+void setButtonPosition(Control *button, Vector2 position);
+void setButtonSize(Control *button, Vector2 size);
+void setButtonColor(Control *button, Vector4 color);
+void setButtonText(Control *button, char * text);
+void setButtonTextHeight(Control *button, int textHeight);
+void setButtonTextColor(Control *button, Vector4 color);
+void setButtonAction(Control *button, void (* action)(struct Button *));
 
 typedef struct Label {
   Vector2 size;

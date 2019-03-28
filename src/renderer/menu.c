@@ -123,6 +123,37 @@ Button * getButton(Control *button) {
   return (Button *)button->control;
 }
 
+void setButtonZ(Control *button, unsigned int z) {
+  getButton(button)->z_index = z;
+}
+
+void setButtonPosition(Control *button, Vector2 position) {
+  getButton(button)->position = position;
+}
+
+void setButtonSize(Control *button, Vector2 size) {
+  getButton(button)->size = size;
+}
+
+void setButtonColor(Control *button, Vector4 color) {
+  getButton(button)->color = color;
+}
+
+void setButtonText(Control *button, char * text) {
+  getButton(button)->text = text;
+}
+
+void setButtonTextHeight(Control *button, int textHeight) {
+  getButton(button)->textHeight = textHeight;
+}
+
+void setButtonTextColor(Control *button, Vector4 color) {
+  getButton(button)->textColor = color;
+}
+
+void setButtonAction(Control *button, void (* action)(struct Button *)) {
+  getButton(button)->action = action;
+}
 
 
 Control * createLabel() {

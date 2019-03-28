@@ -1,5 +1,11 @@
 using Printf
 
+simulation = nothing
+selectionIndex = -1
+simulationActive = true
+
+include("controls.jl")
+
 function setupSimulation(simulation)
   electron = Electron(Vector3(0.0, 3.0, 2.0), Vector3(0.008, 0.0, -0.003))
   proton = Proton(Vector3(0.0, 0.0, 2.0), Vector3(-0.0008, 0.0, 0.0003))
@@ -18,6 +24,17 @@ pauseButton = nothing
 inspectorMenu = nothing
 inspectorLabel = nothing
 kineticEnergyLabel = nothing
+
+function pause(button)
+  if simulationActive == true
+    global simulationActive = false
+    setButtonText(pauseButton, "Resume")
+  else
+    global simulationActive = true
+    setButtonText(pauseButton, "Pause")
+  end
+  return
+end
 
 function setupMenus()
   menus = []
@@ -51,9 +68,17 @@ function setupMenus()
 
   push!(menus, bottomMenu)
 
-  #global pauseButton = createButton()
+  global pauseButton = createButton()
+  setButtonZ(pauseButton, 1)
+  setButtonSize(pauseButton, Vector2(100.0, 15.0))
+  setButtonPosition(pauseButton, Vector2(200.0, 2.5))
+  #setButtonColor(pauseButton, Vector4(0.0, 0.0, 0.0, 0.0))
+  setButtonTextHeight(pauseButton, 15)
+  setButtonText(pauseButton, "Pause")
+  setButtonTextColor(pauseButton, Vector4(1.0, 1.0, 1.0, 1.0))
+  setButtonAction(pauseButton, pause)
 
-  #addControlToMenu(bottomMenu, pauseButton)
+  addControlToMenu(bottomMenu, pauseButton)
 
 
 
@@ -106,7 +131,7 @@ end
 # Main simulation loop
 function simulate()
   # Create the simulation
-  simulation = newSimulation()
+  global simulation = newSimulation()
 
   # Create the rendering setup
   windowWidth = 1280
@@ -135,17 +160,19 @@ function simulate()
   while Renderer.windowCloseStatus(window) != true
     stepsperframe = 10
     for i = 1:stepsperframe
-      simulationStep!(simulation)
+      if simulationActive
+        simulationStep!(simulation)
+      end
     end
-
-    Renderer.pickObject(renderer, simulation)
 
     entityCount = length(simulation.objects)
     setLabelText(entityLabel, "Entities: $entityCount")
     time = simulation.time
     setLabelText(timeLabel, "Time: $time")
 
-    inspectorReadout(simulation.objects[1])
+    if selectionIndex > 0
+      inspectorReadout(simulation.objects[selectionIndex])
+    end
 
     Renderer.render(renderer, simulation, menus)
   end

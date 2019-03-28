@@ -84,6 +84,8 @@ function render(renderer::RenderInfo, simulation, menus)
 
   # Iterate over menus
   for menu in menus
+    ccall((:updateMenu, @fullLibraryPath), Cvoid, (Menu, RenderInfo), menu, renderer)
+
     drawMenu(renderer, menu)
   end
 
@@ -326,7 +328,9 @@ function pickObject(renderer::RenderInfo, simulation)
   worldRay = inverseView * eyeRay
   worldRay = normalize(Vector3(worldRay.x, worldRay.y, -1.0))
 
-  for object in simulation.objects
+  for i in 1:length(simulation.objects)
+    object = simulation.objects[i]
+
     # Ray
     origin = cameraGetPosition(camera)
     direction = worldRay
@@ -340,11 +344,10 @@ function pickObject(renderer::RenderInfo, simulation)
 
     discriminant = (b * b) - c
     if discriminant >= 0
-      # Hit!
-
-      println("we have a hit!")
+      return i
     end
   end
+  return -1
 end
 
 end
