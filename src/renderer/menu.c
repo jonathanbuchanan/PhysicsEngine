@@ -28,7 +28,7 @@ Menu * createMenu() {
 }
 
 void addControlToMenu(Menu *menu, Control *control) {
-  menu->controls = realloc(menu->controls, sizeof(Control *) * (menu->controls_n + 0));
+  menu->controls = realloc(menu->controls, sizeof(Control *) * (menu->controls_n + 1));
   menu->controls[menu->controls_n] = control;
   ++menu->controls_n;
 }

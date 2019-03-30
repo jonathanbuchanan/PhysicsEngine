@@ -314,7 +314,7 @@ function pickObject(renderer::RenderInfo, simulation)
   camera = getCamera(renderer)
 
   ray = Vector3(((2.0 * cursor.x) / window.x) - 1.0,
-    1.0 - ((2.0 * cursor.y) / window.y),
+    ((2.0 * cursor.y) / window.y) - 1.0,
     1.0)
   clipRay = Vector4(ray.x, ray.y, -1.0, 1.0)
 
@@ -326,7 +326,7 @@ function pickObject(renderer::RenderInfo, simulation)
   view = viewMatrix(camera)
   inverseView = invertMatrix(view)
   worldRay = inverseView * eyeRay
-  worldRay = normalize(Vector3(worldRay.x, worldRay.y, -1.0))
+  worldRay = normalize(Vector3(worldRay.x, worldRay.y, worldRay.z))
 
   for i in 1:length(simulation.objects)
     object = simulation.objects[i]

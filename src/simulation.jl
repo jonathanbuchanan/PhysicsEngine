@@ -9,11 +9,11 @@ include("controls.jl")
 function setupSimulation(simulation)
   electron = Electron(Vector3(0.0, 3.0, 2.0), Vector3(0.008, 0.0, -0.003))
   proton = Proton(Vector3(0.0, 0.0, 2.0), Vector3(-0.0008, 0.0, 0.0003))
-  #neutron = Neutron(Vector3(0.0, 0.0, 5.0), Vector3(0.0, 0.0, 0.0))
+  neutron = Neutron(Vector3(0.0, 0.0, 5.0), Vector3(0.0, 0.0, 0.0))
 
   addParticle!(simulation, electron)
   addParticle!(simulation, proton)
-  #addParticle!(simulation, neutron)
+  addParticle!(simulation, neutron)
 end
 
 bottomMenu = nothing
@@ -121,6 +121,16 @@ function setupMenus()
 
   addControlToMenu(inspectorMenu, kineticEnergyLabel)
 
+  global particleLabel = createLabel()
+  setLabelZ(particleLabel, 1)
+  setLabelSize(particleLabel, Vector2(180.0, 15.0))
+  setLabelPosition(particleLabel, Vector2(10.0, 320.0))
+  setLabelColor(particleLabel, Vector4(1.0, 1.0, 1.0, 1.0))
+  setLabelTextHeight(particleLabel, 15)
+  setLabelText(particleLabel, "Particle: ")
+
+  addControlToMenu(inspectorMenu, particleLabel)
+
   return menus
 end
 
@@ -183,6 +193,7 @@ end
 function inspectorReadout(particle)
   setLabelText(positionLabel, Printf.@sprintf("Position: (%0.2f, %0.2f, %0.2f)", particle.position.x, particle.position.y, particle.position.z))
   setLabelText(kineticEnergyLabel, Printf.@sprintf("Kinetic Energy: %0.2f", kineticEnergy(particle) * 1000))
+  setLabelText(particleLabel, Printf.@sprintf("Particle: %s", particleName(particle)))
 end
 
 # Contains a particle and the necessary rendering handle
