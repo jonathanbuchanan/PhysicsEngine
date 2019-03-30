@@ -78,6 +78,7 @@ typedef struct Matrix4x4 {
 
 double * accessMatrix4x4(Matrix4x4 *m, int row, int column);
 Matrix4x4 multiplyMatrix4x4(Matrix4x4 a, Matrix4x4 b);
+Matrix4x4 inverseMatrix4x4(Matrix4x4 m);
 Matrix4x4 identityMatrix4x4();
 Matrix4x4 translationMatrix(Vector3 translation);
 Matrix4x4 scalingMatrix(Vector3 scale);

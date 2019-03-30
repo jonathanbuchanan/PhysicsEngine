@@ -17,6 +17,19 @@ end
 
 # Properties of particles
 
+# Name
+function particleName(::Electron)
+  return "Electron"
+end
+
+function particleName(::Proton)
+  return "Proton"
+end
+
+function particleName(::Neutron)
+  return "Neutron"
+end
+
 # Spin
 function spin(::Electron)
   return 1 / 2
@@ -29,8 +42,6 @@ end
 function spin(::Neutron)
   return 1 / 2
 end
-
-
 
 # Charge
 function charge(::Electron)
@@ -45,8 +56,6 @@ function charge(::Neutron)
   return 0
 end
 
-
-
 # Mass (kg)
 function particleMass(::Electron)
   return 1
@@ -58,4 +67,22 @@ end
 
 function particleMass(::Neutron)
   return 10
+end
+
+# Radius
+function particleRadius(::Electron)
+  return 0.04
+end
+
+function particleRadius(::Proton)
+  return 0.3
+end
+
+function particleRadius(::Neutron)
+  return 0.3
+end
+
+# Kinetic Energy
+function kineticEnergy(particle)
+  return 0.5 * particleMass(particle) * magnitude(particle.velocity) * magnitude(particle.velocity)
 end

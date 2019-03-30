@@ -128,12 +128,20 @@ void windowResizeCallback(GLFWwindow *window, int width, int height) {
   renderer->resizeCallback(renderer, width, height);
 }
 
+void mouseCallback(GLFWwindow *window, int button, int action, int mods) {
+  RenderInfo *renderer = (RenderInfo *)glfwGetWindowUserPointer(window);
+
+  renderer->input.clickCallback(renderer, button, action, mods);
+}
+
 Control button;
 Control label;
 RenderInfo * createRenderer(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
 
   glfwSetWindowSizeCallback(window, windowResizeCallback);
+
+  glfwSetMouseButtonCallback(window, mouseCallback);
 
   RenderInfo *renderer = malloc(sizeof(RenderInfo));
 
@@ -149,6 +157,7 @@ RenderInfo * createRenderer(GLFWwindow *window) {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_MULTISAMPLE);
 
   GLuint vao;
   glGenVertexArrays(1, &vao);
@@ -494,6 +503,13 @@ void renderGrid(RenderInfo *renderer) {
   }
 }
 
+Matrix4x4 projectionMatrix(RenderInfo *renderer) {
+  int height, width;
+  glfwGetFramebufferSize(renderer->window, &width, &height);
+
+  return perspectiveProjectionMatrix(0.1, 100.0, DEGREES_TO_RADIANS(45.0), (double)(width) / (double)(height));
+}
+
 Vector2 getWindowSize(const RenderInfo *renderer) {
   int width, height;
   glfwGetWindowSize(renderer->window, &width, &height);
@@ -544,4 +560,8 @@ void addKeyCallback(RenderInfo *renderer, Key key, KeyAction action, KeyCallback
 
 void setResizeCallback(RenderInfo *renderer, WindowResizeCallback callback) {
   renderer->resizeCallback = callback;
+}
+
+void setClickCallback(RenderInfo *renderer, ClickCallbackFunction callback) {
+  renderer->input.clickCallback = callback;
 }

@@ -1,16 +1,40 @@
+using Printf
+
+simulation = nothing
+selectionIndex = -1
+simulationActive = true
+
+include("controls.jl")
+
 function setupSimulation(simulation)
   electron = Electron(Vector3(0.0, 3.0, 2.0), Vector3(0.008, 0.0, -0.003))
   proton = Proton(Vector3(0.0, 0.0, 2.0), Vector3(-0.0008, 0.0, 0.0003))
-  #neutron = Neutron(Vector3(0.0, 0.0, 5.0), Vector3(0.0, 0.0, 0.0))
+  neutron = Neutron(Vector3(0.0, 0.0, 5.0), Vector3(0.0, 0.0, 0.0))
 
   addParticle!(simulation, electron)
   addParticle!(simulation, proton)
-  #addParticle!(simulation, neutron)
+  addParticle!(simulation, neutron)
 end
 
 bottomMenu = nothing
 entityLabel = nothing
 timeLabel = nothing
+pauseButton = nothing
+
+inspectorMenu = nothing
+inspectorLabel = nothing
+kineticEnergyLabel = nothing
+
+function pause(button)
+  if simulationActive == true
+    global simulationActive = false
+    setButtonText(pauseButton, "Resume")
+  else
+    global simulationActive = true
+    setButtonText(pauseButton, "Pause")
+  end
+  return
+end
 
 function setupMenus()
   menus = []
@@ -44,6 +68,69 @@ function setupMenus()
 
   push!(menus, bottomMenu)
 
+  global pauseButton = createButton()
+  setButtonZ(pauseButton, 1)
+  setButtonSize(pauseButton, Vector2(100.0, 15.0))
+  setButtonPosition(pauseButton, Vector2(200.0, 2.5))
+  #setButtonColor(pauseButton, Vector4(0.0, 0.0, 0.0, 0.0))
+  setButtonTextHeight(pauseButton, 15)
+  setButtonText(pauseButton, "Pause")
+  setButtonTextColor(pauseButton, Vector4(1.0, 1.0, 1.0, 1.0))
+  setButtonAction(pauseButton, pause)
+
+  addControlToMenu(bottomMenu, pauseButton)
+
+
+
+  global inspectorMenu = createMenu()
+
+  setMenuOrientation(inspectorMenu, Vertical)
+  setMenuPosition(inspectorMenu, Vector2(20.0, 200.0))
+  setMenuSize(inspectorMenu, Vector2(200.0, 400.0))
+  setMenuColor(inspectorMenu, Vector4(0.3, 0.3, 0.3, 1.0))
+
+  push!(menus, inspectorMenu)
+
+  global inspectorLabel = createLabel()
+  setLabelZ(inspectorLabel, 1)
+  setLabelSize(inspectorLabel, Vector2(180.0, 15.0))
+  setLabelPosition(inspectorLabel, Vector2(10.0, 380.0))
+  setLabelColor(inspectorLabel, Vector4(1.0, 1.0, 1.0, 1.0))
+  setLabelTextHeight(inspectorLabel, 15)
+  setLabelText(inspectorLabel, "Inspector")
+
+  addControlToMenu(inspectorMenu, inspectorLabel)
+
+  global positionLabel = createLabel()
+  setLabelZ(positionLabel, 1)
+  setLabelSize(positionLabel, Vector2(180.0, 15.0))
+  setLabelPosition(positionLabel, Vector2(10.0, 360.0))
+  setLabelColor(positionLabel, Vector4(1.0, 1.0, 1.0, 1.0))
+  setLabelTextHeight(positionLabel, 15)
+  setLabelText(positionLabel, "Position: ( , , )")
+
+  addControlToMenu(inspectorMenu, positionLabel)
+
+  global kineticEnergyLabel = createLabel()
+  setLabelZ(kineticEnergyLabel, 1)
+  setLabelSize(kineticEnergyLabel, Vector2(180.0, 15.0))
+  setLabelPosition(kineticEnergyLabel, Vector2(10.0, 340.0))
+  setLabelColor(kineticEnergyLabel, Vector4(1.0, 1.0, 1.0, 1.0))
+  setLabelTextHeight(kineticEnergyLabel, 15)
+  setLabelText(kineticEnergyLabel, "Kinetic Energy: ")
+
+  addControlToMenu(inspectorMenu, kineticEnergyLabel)
+
+  global particleLabel = createLabel()
+  setLabelZ(particleLabel, 1)
+  setLabelSize(particleLabel, Vector2(180.0, 15.0))
+  setLabelPosition(particleLabel, Vector2(10.0, 320.0))
+  setLabelColor(particleLabel, Vector4(1.0, 1.0, 1.0, 1.0))
+  setLabelTextHeight(particleLabel, 15)
+  setLabelText(particleLabel, "Particle: ")
+
+  addControlToMenu(inspectorMenu, particleLabel)
+
   return menus
 end
 
@@ -54,7 +141,7 @@ end
 # Main simulation loop
 function simulate()
   # Create the simulation
-  simulation = newSimulation()
+  global simulation = newSimulation()
 
   # Create the rendering setup
   windowWidth = 1280
@@ -83,7 +170,9 @@ function simulate()
   while Renderer.windowCloseStatus(window) != true
     stepsperframe = 10
     for i = 1:stepsperframe
-      simulationStep!(simulation)
+      if simulationActive
+        simulationStep!(simulation)
+      end
     end
 
     entityCount = length(simulation.objects)
@@ -91,10 +180,20 @@ function simulate()
     time = simulation.time
     setLabelText(timeLabel, "Time: $time")
 
+    if selectionIndex > 0
+      inspectorReadout(simulation.objects[selectionIndex])
+    end
+
     Renderer.render(renderer, simulation, menus)
   end
 
   Renderer.terminate(renderer)
+end
+
+function inspectorReadout(particle)
+  setLabelText(positionLabel, Printf.@sprintf("Position: (%0.2f, %0.2f, %0.2f)", particle.position.x, particle.position.y, particle.position.z))
+  setLabelText(kineticEnergyLabel, Printf.@sprintf("Kinetic Energy: %0.2f", kineticEnergy(particle) * 1000))
+  setLabelText(particleLabel, Printf.@sprintf("Particle: %s", particleName(particle)))
 end
 
 # Contains a particle and the necessary rendering handle

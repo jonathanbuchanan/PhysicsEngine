@@ -28,7 +28,7 @@ Menu * createMenu() {
 }
 
 void addControlToMenu(Menu *menu, Control *control) {
-  menu->controls = realloc(menu->controls, sizeof(Control *) * (menu->controls_n + 0));
+  menu->controls = realloc(menu->controls, sizeof(Control *) * (menu->controls_n + 1));
   menu->controls[menu->controls_n] = control;
   ++menu->controls_n;
 }
@@ -123,6 +123,37 @@ Button * getButton(Control *button) {
   return (Button *)button->control;
 }
 
+void setButtonZ(Control *button, unsigned int z) {
+  getButton(button)->z_index = z;
+}
+
+void setButtonPosition(Control *button, Vector2 position) {
+  getButton(button)->position = position;
+}
+
+void setButtonSize(Control *button, Vector2 size) {
+  getButton(button)->size = size;
+}
+
+void setButtonColor(Control *button, Vector4 color) {
+  getButton(button)->color = color;
+}
+
+void setButtonText(Control *button, char * text) {
+  getButton(button)->text = text;
+}
+
+void setButtonTextHeight(Control *button, int textHeight) {
+  getButton(button)->textHeight = textHeight;
+}
+
+void setButtonTextColor(Control *button, Vector4 color) {
+  getButton(button)->textColor = color;
+}
+
+void setButtonAction(Control *button, void (* action)(struct Button *)) {
+  getButton(button)->action = action;
+}
 
 
 Control * createLabel() {
@@ -143,7 +174,7 @@ int drawLabel(void *c, RenderInfo *renderer, Vector2 offset) {
 
   // Convert pixel coordinates to NDC
   // Position specifies bottom left coordinates
-  drawText(renderer, label->text, label->position, label->size, (float)label->textHeight / (float)FONT_SIZE, label->color);
+  drawText(renderer, label->text, add2(label->position, offset), label->size, (float)label->textHeight / (float)FONT_SIZE, label->color);
 
   return 0;
 }

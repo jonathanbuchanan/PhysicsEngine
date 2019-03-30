@@ -48,7 +48,7 @@ end
     return true
   end
 
-  @test m1 * m2 == PhysicsEngine.Matrix4x4((122, 157, 156, 139, 60, 89, 98, 47, 86, 89, 116, 60, 108, 148, 163, 95)) 
+  @test m1 * m2 == PhysicsEngine.Matrix4x4((122, 157, 156, 139, 60, 89, 98, 47, 86, 89, 116, 60, 108, 148, 163, 95))
   @test m1 * v1 == PhysicsEngine.Vector4((455, 179, 242, 346))
   @test PhysicsEngine.identityMatrix() == PhysicsEngine.Matrix4x4((1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1))
   @test PhysicsEngine.translationMatrix(PhysicsEngine.vec3(2.0, 3.0, -1.0)) == PhysicsEngine.Matrix4x4((1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 3.0, 0.0, 0.0, 1.0, -1.0, 0.0, 0.0, 0.0, 1.0))
@@ -58,5 +58,8 @@ end
   @test isapproxmatrix(PhysicsEngine.rotationXMatrix(45.0),  PhysicsEngine.Matrix4x4((1.0, 0.0, 0.0, 0.0, 0.0, cos(-45.0), -sin(-45.0), 0.0, 0.0, sin(-45.0), cos(-45.0), 0.0, 0.0, 0.0, 0.0, 1.0)))
   @test isapproxmatrix(PhysicsEngine.rotationYMatrix(30.0), PhysicsEngine.Matrix4x4((cos(-30.0), 0.0, sin(-30.0), 0.0, 0.0, 1.0, 0.0, 0.0, -sin(-30.0), 0.0, cos(-30.0), 0.0, 0.0, 0.0, 0.0, 1.0)))
   @test isapproxmatrix(PhysicsEngine.rotationZMatrix(22.0), PhysicsEngine.Matrix4x4((cos(-22.0), -sin(-22.0), 0.0, 0.0, sin(-22.0), cos(-22.0), 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)))
+
+  #println(PhysicsEngine.invertMatrix(m1))
+  #@test isapproxmatrix(PhysicsEngine.invertMatrix(m1))
   # @test rotating vectors
 end

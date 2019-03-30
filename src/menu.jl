@@ -34,6 +34,10 @@ function addControlToMenu(menu, control)
   ccall((:addControlToMenu, @fullLibraryPath), Cvoid, (Menu, Control), menu, control)
 end
 
+function updateMenu(menu)
+  ccall((:updateMenu, @fullLibraryPath), Cvoid, (Menu,), menu)
+end
+
 # Label
 function createLabel()
   ccall((:createLabel, @fullLibraryPath), Label, ())
@@ -66,4 +70,32 @@ end
 # Button
 function createButton()
   ccall((:createButton, @fullLibraryPath), Button, ())
+end
+
+function setButtonZ(button, z)
+  ccall((:setButtonZ, @fullLibraryPath), Cvoid, (Button, Cint), button, z)
+end
+
+function setButtonPosition(button, position)
+  ccall((:setButtonPosition, @fullLibraryPath), Cvoid, (Button, Vector2), button, position)
+end
+
+function setButtonSize(button, size)
+  ccall((:setButtonSize, @fullLibraryPath), Cvoid, (Button, Vector2), button, size)
+end
+
+function setButtonTextHeight(button, textHeight)
+  ccall((:setButtonTextHeight, @fullLibraryPath), Cvoid, (Button, Cint), button, textHeight)
+end
+
+function setButtonText(button, text)
+  ccall((:setButtonText, @fullLibraryPath), Cvoid, (Button, Cstring), button, text)
+end
+
+function setButtonAction(button, action)
+  ccall((:setButtonAction, @fullLibraryPath), Cvoid, (Button, Ptr{Cvoid}), button, @cfunction($action, Cvoid, (Button,)))
+end
+
+function setButtonTextColor(button, textColor)
+  ccall((:setButtonTextColor, @fullLibraryPath), Cvoid, (Button, Vector4), button, textColor)
 end

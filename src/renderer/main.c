@@ -22,6 +22,7 @@ int init() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_SAMPLES, 4);
   return 0;
 }
 
@@ -51,4 +52,3 @@ void terminate(RenderInfo *renderer) {
   glfwTerminate();
   freeRenderer(renderer);
 }
-

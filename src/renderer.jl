@@ -1,9 +1,13 @@
 module Renderer
 
 import ..@fullLibraryPath
+import ..Vector2
 import ..Vector3
+import ..Vector4
+import ..Matrix4x4
 
 import ..Electron, ..Proton, ..Neutron
+import ..particleRadius
 
 import ..Menu
 
@@ -30,15 +34,15 @@ function color(::Neutron)
 end
 
 function drawParticle(renderer, particle::Electron)
-  drawSphere(renderer, 0.04, color(particle), particle.position)
+  drawSphere(renderer, particleRadius(particle), color(particle), particle.position)
 end
 
 function drawParticle(renderer, particle::Proton)
-  drawSphere(renderer, 0.3, color(particle), particle.position)
+  drawSphere(renderer, particleRadius(particle), color(particle), particle.position)
 end
 
 function drawParticle(renderer, particle::Neutron)
-  drawSphere(renderer, 0.3, color(particle), particle.position)
+  drawSphere(renderer, particleRadius(particle), color(particle), particle.position)
 end
 
 function drawMenu(renderer, menu)
@@ -80,6 +84,8 @@ function render(renderer::RenderInfo, simulation, menus)
 
   # Iterate over menus
   for menu in menus
+    ccall((:updateMenu, @fullLibraryPath), Cvoid, (Menu, RenderInfo), menu, renderer)
+
     drawMenu(renderer, menu)
   end
 
@@ -109,6 +115,18 @@ end
 
 function setResizeCallback(renderer, callback)
   ccall((:setResizeCallback, @fullLibraryPath), Cvoid, (RenderInfo, Ptr{Cvoid}), renderer, @cfunction($callback, Cvoid, (RenderInfo, Cint, Cint)))
+end
+
+function setClickCallback(renderer, callback)
+  ccall((:setClickCallback, @fullLibraryPath), Cvoid, (RenderInfo, Ptr{Cvoid}), renderer, @cfunction($callback, Cvoid, (RenderInfo, Cint, Cint, Cint)))
+end
+
+function getCursorPosition(renderer)
+  return ccall((:getCursorPosition, @fullLibraryPath), Vector2, (RenderInfo,), renderer)
+end
+
+function getWindowSize(renderer)
+  return ccall((:getWindowSize, @fullLibraryPath), Vector2, (RenderInfo,), renderer)
 end
 
 @enum Key begin
@@ -241,6 +259,13 @@ end
   Repeat = 2
 end
 
+@enum MouseButton begin
+  MouseButtonLast = 7
+  MouseButtonLeft = 0
+  MouseButtonMiddle = 2
+  MouseButtonRight = 1
+end
+
 const Camera = Ptr{Cvoid}
 
 function getCamera(renderer::RenderInfo)
@@ -269,6 +294,60 @@ end
 
 function cameraSetUp(camera::Camera, up::Vector3)
   return ccall((:cameraSetUp, @fullLibraryPath), Cvoid, (Camera, Vector3), camera, up)
+end
+
+function projectionMatrix(renderer)
+  return ccall((:projectionMatrix, @fullLibraryPath), Matrix4x4, (RenderInfo,), renderer)
+end
+
+function viewMatrix(camera)
+  return ccall((:getViewMatrix, @fullLibraryPath), Matrix4x4, (Camera,), camera)
+end
+
+import ..invertMatrix
+import ..normalize
+import ..dot
+
+function pickObject(renderer::RenderInfo, simulation)
+  cursor = getCursorPosition(renderer)
+  window = getWindowSize(renderer)
+  camera = getCamera(renderer)
+
+  ray = Vector3(((2.0 * cursor.x) / window.x) - 1.0,
+    ((2.0 * cursor.y) / window.y) - 1.0,
+    1.0)
+  clipRay = Vector4(ray.x, ray.y, -1.0, 1.0)
+
+  projection = projectionMatrix(renderer)
+  inverseProjection = invertMatrix(projection)
+  eyeRay = inverseProjection * clipRay
+  eyeRay = Vector4(eyeRay.x, eyeRay.y, -1.0, 0.0)
+
+  view = viewMatrix(camera)
+  inverseView = invertMatrix(view)
+  worldRay = inverseView * eyeRay
+  worldRay = normalize(Vector3(worldRay.x, worldRay.y, worldRay.z))
+
+  for i in 1:length(simulation.objects)
+    object = simulation.objects[i]
+
+    # Ray
+    origin = cameraGetPosition(camera)
+    direction = worldRay
+
+    # Particle
+    center = object.position
+    radius = particleRadius(object)
+
+    b = dot(direction, origin - center)
+    c = dot(origin - center, origin - center) - (radius * radius)
+
+    discriminant = (b * b) - c
+    if discriminant >= 0
+      return i
+    end
+  end
+  return -1
 end
 
 end
